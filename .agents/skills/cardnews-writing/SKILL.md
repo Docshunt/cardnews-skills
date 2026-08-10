@@ -35,7 +35,8 @@ Create an editorial card-news package that is ready for visual review and can be
 - Report only the useful outcome: what was made, how many cards are ready, whether the checks passed, where the result is saved, and any choice the user still needs to make.
 - Keep the topic-specific images, captions, sources, previews, and reports inside `outputs/<slug>/`. They are local deliverables and must never be tracked or shared with the reusable template.
 - When the user asks to see the result, resolve the absolute `outputs/<slug>` path, run `open <absolute-output-folder>` on macOS, and reply in Korean that the result folder was opened. Do not show the command.
-- When the result meets the requested quality and no change request remains, immediately save only reusable skill or template improvements to `main` and share them. Never include `outputs/`, even by force.
+- When the result meets the requested quality and no change request remains, immediately save only reusable skill, template, root `README.md`, or operating-guide improvements to `main` and share them. Never include `outputs/`, even by force.
+- Keep the root `README.md` permanently as the plain-Korean guide for users. Never delete or omit it, and never create another README inside this skill folder.
 
 ## Editorial direction
 
