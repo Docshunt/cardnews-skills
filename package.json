@@ -1,0 +1,37 @@
+{
+  "name": "@docshunt/cardnews-skills",
+  "version": "0.1.0",
+  "description": "Codex-ready Korean editorial card-news skill for Instagram and Threads.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Docshunt/cardnews-skills.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Docshunt/cardnews-skills/issues"
+  },
+  "homepage": "https://github.com/Docshunt/cardnews-skills#readme",
+  "files": [
+    ".agents/skills",
+    "AGENTS.md",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node .agents/skills/cardnews-writing/scripts/validate-cardnews.mjs --self-test",
+    "pack:check": "npm pack --dry-run"
+  },
+  "npmSkills": {
+    "publish": {
+      "source": ".agents/skills",
+      "export": ["cardnews-writing"]
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

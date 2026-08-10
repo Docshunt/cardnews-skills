@@ -1,0 +1,4 @@
+interface:
+  display_name: "Card News Studio"
+  short_description: "Instagram·Threads용 한국어 카드뉴스 제작·게시 준비"
+  default_prompt: "Use $cardnews-writing to turn this topic into an editorial carousel for Instagram and a Threads publishing package."
