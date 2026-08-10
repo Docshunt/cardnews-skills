@@ -12,22 +12,23 @@ Create an editorial card-news package that is ready for visual review and can be
 1. Inspect the repository for existing brand assets, fonts, image helpers, output conventions, and source material. Reuse them before adding anything.
 2. Establish the audience, the editor's one-sentence claim, factual sources, intended takeaway, CTA, and visual mode before designing slides. A topic is not a claim: turn “AI 시대의 교육 변화 5가지” into a specific point of view the evidence can support.
 3. Write the slide plan before rendering. Build a swipeable argument rather than a list of isolated facts: `claim → tension → story → turn → evidence → interpretation → close`. Let a dense story use two or more short cards instead of shrinking the type.
-4. Create `manifest.json` first. Follow [references/manifest.md](references/manifest.md) and keep every slide file listed there.
-5. Render raster slides at `1080×1350` by default. Use `1080×1440` only when the requested visual direction needs the taller 3:4 canvas. Keep text inside a 72px horizontal and 96px vertical safe area.
-6. Use real, licensed, or user-provided photography when a subject or event is central. Use `$imagegen` only for missing illustrative imagery; render all important text with SVG, HTML/CSS, or another deterministic compositor rather than asking an image model to spell it.
-7. Validate the package:
+4. Create `manifest.json` first. Follow [references/manifest.md](references/manifest.md), choose a layout primitive for every slide, and keep every slide file listed there.
+5. Start from the bundled [editorial card system](assets/editorial-card-system/). Use its HTML/CSS source as the production base: set the three theme tokens, select the needed primitives, replace the placeholder copy and imagery, then render each card deterministically. Do not invent a new visual treatment for every slide.
+6. Render raster slides at `1080×1350` by default. Use `1080×1440` only when the requested visual direction needs the taller 3:4 canvas. Keep text inside a 72px horizontal and 96px vertical safe area.
+7. Use real, licensed, or user-provided photography when a subject or event is central. Use `$imagegen` only for missing illustrative imagery; render all important text with SVG, HTML/CSS, or another deterministic compositor rather than asking an image model to spell it.
+8. Validate the package:
 
    ```bash
    node .agents/skills/cardnews-writing/scripts/validate-cardnews.mjs outputs/<slug>
    ```
 
-8. Inspect a contact sheet at mobile scale. For reference-led or production-quality work, complete at least two documented review loops:
+9. Inspect a contact sheet at mobile scale. For reference-led or production-quality work, complete at least two documented review loops:
    - inspect both the full-size slides and a 320px-wide contact sheet;
    - ask an independent vision or design reviewer to score hook clarity, Korean legibility, hierarchy, slide rhythm, reference fit without copying, and source trust from 1–5 without seeding expected defects;
    - fix every category below 4, render again, and rerun the validator;
    - record the scores, changes, and remaining limits in `qa/report.md`.
-9. Write platform variants. Instagram gets the carousel caption; Threads gets a short lead post plus reply-sized beats. Keep the claim, story beats, interpretation, and sources aligned.
-10. Read [references/publishing.md](references/publishing.md) before any API or browser publishing. Publish only when the user explicitly asks for it and the required account authorization is already available.
+10. Write platform variants. Instagram gets the carousel caption; Threads gets a short lead post plus reply-sized beats. Keep the claim, story beats, interpretation, and sources aligned.
+11. Read [references/publishing.md](references/publishing.md) before any API or browser publishing. Publish only when the user explicitly asks for it and the required account authorization is already available.
 
 ## Conversation and handoff
 
@@ -57,6 +58,22 @@ Choose the least decorative mode that makes the story clear:
 - `profile`: person, company, book, tool, or case study.
 
 Do not reproduce the reference accounts' logos, watermarks, exact layouts, captions, phrasing, or imagery. Replace them with the user's brand system and give collaborators credit where required. Read [references/visual-direction.md](references/visual-direction.md) before choosing type, imagery, or slide rhythm.
+
+## Layout system
+
+Use the seven bundled primitives, not a different template for each page:
+
+- `cover`: one strong claim with either a dominant image or a type-led field;
+- `statement`: one short editorial assertion or transition;
+- `text`: a readable paragraph card with a stable left edge;
+- `photo-text`: one evidence-bearing image with a short caption or claim;
+- `quote`: a source-attributed quotation with enough whitespace to feel deliberate;
+- `data`: one number, comparison, or compact evidence set—never a dashboard;
+- `closing`: the thought, implication, or reference the reader should retain.
+
+Use the same canvas, grid, masthead, page number, type scale, and three colour tokens across the whole carousel. Default to 2–4 primitive types in a 6–8 slide story; repeat `text`, `statement`, or `photo-text` when the narrative needs it. Change a layout only to clarify a new kind of evidence or create a meaningful turning point.
+
+Copy `assets/editorial-card-system/` into the card-news working folder before editing. Its `card.css` contains the tokens and shared geometry; each named HTML file is one renderable 1080×1350 page. Do not put text inside a generated image. Set `--background`, `--ink`, and `--accent` once per issue, then change them only for intentional photo contrast.
 
 ## Output contract
 

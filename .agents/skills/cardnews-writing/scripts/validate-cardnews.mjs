@@ -5,6 +5,7 @@ import os from "node:os";
 import path from "node:path";
 
 const CANVASES = new Set(["1080x1350", "1080x1440"]);
+const LAYOUTS = new Set(["cover", "statement", "text", "photo-text", "quote", "data", "closing"]);
 const JPEG_SOFS = new Set([
   0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf,
 ]);
@@ -88,6 +89,16 @@ function validateManifest(outputDir, manifestName = "manifest.json") {
     }
   }
 
+  const design = manifest.design;
+  if (!design || typeof design !== "object" || Array.isArray(design)) {
+    errors.push("design with editorial-card-system tokens is required.");
+  } else {
+    if (design.system !== "editorial-card-system") errors.push("design.system must be editorial-card-system.");
+    for (const token of ["background", "ink", "accent"]) {
+      if (!nonEmpty(design[token])) errors.push(`design.${token} is required.`);
+    }
+  }
+
   const canvas = manifest.canvas;
   const canvasKey = `${canvas?.width}x${canvas?.height}`;
   if (!CANVASES.has(canvasKey)) errors.push("canvas must be 1080x1350 or 1080x1440.");
@@ -109,7 +120,9 @@ function validateManifest(outputDir, manifestName = "manifest.json") {
       }
       if (!nonEmpty(slide.headline)) errors.push(`${label}.headline is required.`);
       if (!nonEmpty(slide.alt)) errors.push(`${label}.alt is required.`);
+      if (!LAYOUTS.has(slide.layout)) errors.push(`${label}.layout must be one of: ${[...LAYOUTS].join(", ")}.`);
       if (index === 0 && slide.role !== "cover") errors.push("slides[0].role must be cover.");
+      if (index === 0 && slide.layout !== "cover") errors.push("slides[0].layout must be cover.");
       if ([...String(slide.headline ?? "")].length > 34) warnings.push(`${label}.headline is long; check it at thumbnail size.`);
 
       const relativeFile = String(slide.file);
@@ -167,10 +180,17 @@ function selfTest() {
         reader_takeaway: "한 문장 주장을 먼저 쓴다.",
         narrative_arc: ["claim", "evidence", "interpretation", "close"],
       },
+      design: {
+        system: "editorial-card-system",
+        background: "#F6F2EA",
+        ink: "#171717",
+        accent: "#C94B32",
+      },
       canvas: { width: 1080, height: 1350 },
       slides: [1, 2, 3, 4].map((index) => ({
         file: `slides/${String(index).padStart(2, "0")}.png`,
         role: index === 1 ? "cover" : "body",
+        layout: index === 1 ? "cover" : "text",
         headline: `카드 ${index}`,
         alt: `카드 ${index} 설명`,
       })),
@@ -186,6 +206,31 @@ function selfTest() {
     const missingEditorial = validateManifest(root);
     if (!missingEditorial.errors.includes("editorial with claim, reader_takeaway, and narrative_arc is required.")) {
       throw new Error("Missing editorial metadata was not rejected.");
+    }
+
+    manifest.editorial = {
+      claim: "좋은 카드뉴스는 주장으로 시작합니다.",
+      reader_takeaway: "한 문장 주장을 먼저 쓴다.",
+      narrative_arc: ["claim", "evidence", "interpretation", "close"],
+    };
+    delete manifest.design;
+    fs.writeFileSync(path.join(root, "manifest.json"), JSON.stringify(manifest));
+    const missingDesign = validateManifest(root);
+    if (!missingDesign.errors.includes("design with editorial-card-system tokens is required.")) {
+      throw new Error("Missing design metadata was not rejected.");
+    }
+
+    manifest.design = {
+      system: "editorial-card-system",
+      background: "#F6F2EA",
+      ink: "#171717",
+      accent: "#C94B32",
+    };
+    manifest.slides[1].layout = "poster";
+    fs.writeFileSync(path.join(root, "manifest.json"), JSON.stringify(manifest));
+    const invalidLayout = validateManifest(root);
+    if (!invalidLayout.errors.some((error) => error.startsWith("slides[1].layout must be one of:"))) {
+      throw new Error("Invalid layout was not rejected.");
     }
     console.log("Card-news validator self-test passed.");
   } finally {

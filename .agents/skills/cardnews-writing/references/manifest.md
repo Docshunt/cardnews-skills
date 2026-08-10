@@ -12,29 +12,39 @@ Create `manifest.json` in the card-news output folder. It is intentionally small
     "reader_takeaway": "이번 주에 바꿀 수 있는 반복 업무 하나를 고른다.",
     "narrative_arc": ["claim", "tension", "story", "evidence", "interpretation", "close"]
   },
+  "design": {
+    "system": "editorial-card-system",
+    "background": "#F6F2EA",
+    "ink": "#171717",
+    "accent": "#C94B32"
+  },
   "canvas": { "width": 1080, "height": 1350 },
   "slides": [
     {
       "file": "slides/01-cover.png",
       "role": "cover",
+      "layout": "cover",
       "headline": "교사의 시간을 돌려주는 작은 변화",
       "alt": "교사의 시간을 줄이는 방법을 소개하는 표지"
     },
     {
       "file": "slides/02-context.png",
       "role": "context",
+      "layout": "text",
       "headline": "문제는 도구가 아니라 흐름입니다",
       "alt": "반복 업무가 시간을 빼앗는 상황을 설명하는 카드"
     },
     {
       "file": "slides/03-action.png",
       "role": "action",
+      "layout": "statement",
       "headline": "오늘 바로 바꿀 한 가지",
       "alt": "오늘 바로 적용할 한 가지 행동을 설명하는 카드"
     },
     {
       "file": "slides/04-close.png",
       "role": "close",
+      "layout": "closing",
       "headline": "저장해 두고 다음 주에 확인하세요",
       "alt": "핵심 내용을 저장하고 실천하라는 마무리 카드"
     }
@@ -58,8 +68,9 @@ Create `manifest.json` in the card-news output folder. It is intentionally small
 
 - `slug`: one lowercase kebab-case path segment.
 - `editorial`: record the supported `claim`, the reader's `reader_takeaway`, and the planned `narrative_arc`. Do not substitute a topic label for the claim. The claim can be an argued reading, but it must be distinguishable from the facts in the cards and sources.
+- `design`: record the `editorial-card-system` and one shared `background`, `ink`, and `accent` value. Start from the bundled HTML/CSS assets, then adapt only these tokens to the user's brand unless contrast requires a local override.
 - `canvas`: `1080×1350` is the default shared canvas; `1080×1440` is also accepted for the taller magazine treatment.
-- `slides`: 4–10 ordered raster files. The first slide must have `role: "cover"`; every slide needs `file`, `headline`, and useful `alt` text. Use narrative roles such as `claim`, `tension`, `story`, `turn`, `evidence`, `interpretation`, and `close` when they make the sequence easier to review.
+- `slides`: 4–10 ordered raster files. The first slide must have `role: "cover"`; every slide needs `file`, `layout`, `headline`, and useful `alt` text. `layout` must be one of `cover`, `statement`, `text`, `photo-text`, `quote`, `data`, or `closing`. Use narrative roles such as `claim`, `tension`, `story`, `turn`, `evidence`, `interpretation`, and `close` when they make the sequence easier to review.
 - `platforms.instagram.caption`: the final Instagram caption, including CTA and source notes when needed.
 - `platforms.threads.root`: the first Threads post. Keep `replies` short enough to read as a sequence, not as copied Instagram paragraphs.
 - `sources`: at least one source object for the review trail. Use an official or primary source for time-sensitive claims.

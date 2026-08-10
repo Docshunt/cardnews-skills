@@ -28,6 +28,16 @@ For either treatment:
 - Use images as evidence or atmosphere, not interchangeable backgrounds. Crop for the subject and preserve enough negative space for the headline.
 - Keep a small, unobtrusive publication mark in one consistent position if the user has a brand. Never place it over a face or the key evidence.
 
+## Reusable forms
+
+Use the actual HTML/CSS sources in [`../assets/editorial-card-system/`](../assets/editorial-card-system/) instead of rebuilding pages from scratch. It has exactly seven forms: `cover`, `statement`, `text`, `photo-text`, `quote`, `data`, and `closing`.
+
+- Reuse the same margin, masthead, page number, type scale, and colour tokens on every card.
+- Keep a six-to-eight card issue to two-to-four of these forms. Repetition is the visual identity; variation earns its place only when the evidence changes from prose to image, quotation, or data.
+- Use `statement` for a pivot sentence, not as a second cover. Use `data` for one revealing number or comparison, not a miniature report. Use `quote` only with an attributable source.
+- Put the text in the supplied HTML and style it through variables. Do not rasterize copy into photos, generate spellings with an image model, or use decorative elements to disguise a weak hierarchy.
+- Use a light base by default. Let an image-led `cover` or `photo-text` card borrow a dark treatment solely for contrast, then return to the same issue tokens.
+
 ## Slide rhythm
 
 Use 6–8 slides by default. Adapt this backbone; do not force every story into every role.
