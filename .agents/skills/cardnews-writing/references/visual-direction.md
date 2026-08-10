@@ -40,7 +40,8 @@ canvas: 1080×1350
 safe area: 72px left/right, 96px top/bottom
 slides: 6–8
 headline: 1–2 lines, one idea
-body: 20–28px minimum at 1080px export
+body: 34–42px for swipe-reading at 320px; remove secondary copy before shrinking it
+source labels: 28px minimum; keep full URLs in the caption or sources file
 accent: one color only, unless the brand already has a palette
 mark: one small placement, never over the subject
 ```

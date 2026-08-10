@@ -21,7 +21,11 @@ Create an editorial card-news package that is ready for visual review and can be
    node .agents/skills/cardnews-writing/scripts/validate-cardnews.mjs outputs/<slug>
    ```
 
-8. Inspect a contact sheet at mobile scale. Fix illegible type, weak contrast, clipped text, repeated layouts, and unsupported claims before handoff.
+8. Inspect a contact sheet at mobile scale. For reference-led or production-quality work, complete at least two documented review loops:
+   - inspect both the full-size slides and a 320px-wide contact sheet;
+   - ask an independent vision or design reviewer to score hook clarity, Korean legibility, hierarchy, slide rhythm, reference fit without copying, and source trust from 1–5 without seeding expected defects;
+   - fix every category below 4, render again, and rerun the validator;
+   - record the scores, changes, and remaining limits in `qa/report.md`.
 9. Write platform variants. Instagram gets the carousel caption; Threads gets a short lead post plus reply-sized beats. Keep the claim order and sources aligned.
 10. Read [references/publishing.md](references/publishing.md) before any API or browser publishing. Publish only when the user explicitly asks for it and the required account authorization is already available.
 
@@ -65,4 +69,5 @@ The `manifest.json` is the source of truth for slide order, dimensions, headline
 - Keep source links close to the claim in `sources.json` and the final caption or source slide.
 - Make every slide understandable without the caption; make every slide describable in `alt` text.
 - Keep the first slide useful as a thumbnail and the final slide useful as a saved reference.
+- Do not hide trust signals in unreadable footnotes. Keep slide source labels at least 28px on a 1080px canvas, or move the full citation to the caption and `sources.json`.
 - Do not publish secrets, access tokens, private source URLs, or unapproved sponsored copy.
