@@ -29,6 +29,14 @@ Create an editorial card-news package that is ready for visual review and can be
 9. Write platform variants. Instagram gets the carousel caption; Threads gets a short lead post plus reply-sized beats. Keep the claim order and sources aligned.
 10. Read [references/publishing.md](references/publishing.md) before any API or browser publishing. Publish only when the user explicitly asks for it and the required account authorization is already available.
 
+## Conversation and handoff
+
+- Speak to the user only in plain, everyday Korean. Never mention development terms or internal work such as repositories, branches, commits, pushes, packages, manifests, validators, scripts, commands, or runtimes.
+- Report only the useful outcome: what was made, how many cards are ready, whether the checks passed, where the result is saved, and any choice the user still needs to make.
+- Keep the topic-specific images, captions, sources, previews, and reports inside `outputs/<slug>/`. They are local deliverables and must never be tracked or shared with the reusable template.
+- When the user asks to see the result, resolve the absolute `outputs/<slug>` path, run `open <absolute-output-folder>` on macOS, and reply in Korean that the result folder was opened. Do not show the command.
+- When the result meets the requested quality and no change request remains, immediately save only reusable skill or template improvements to `main` and share them. Never include `outputs/`, even by force.
+
 ## Editorial direction
 
 Use the references as a north star, not as a brand to copy. Default to a photo-led magazine cover, a high-contrast headline over a dark gradient, restrained accent color, and a small consistent brand mark. Prefer:
