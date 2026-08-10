@@ -1,6 +1,6 @@
 ---
 name: cardnews-writing
-description: Create Korean editorial card-news carousels and cross-platform publishing packages for Instagram and Threads. Use when turning a topic, article, interview, announcement, product, or source material into magazine-style visual slides, captions, alt text, and publish-ready metadata.
+description: Create Korean text-led editorial card-news carousels and cross-platform publishing packages for Instagram and Threads. Use when turning a topic, article, interview, announcement, product, or source material into an opinionated magazine-style story with slides, captions, alt text, and publish-ready metadata.
 ---
 
 # Card News Writing
@@ -10,8 +10,8 @@ Create an editorial card-news package that is ready for visual review and can be
 ## Workflow
 
 1. Inspect the repository for existing brand assets, fonts, image helpers, output conventions, and source material. Reuse them before adding anything.
-2. Establish the audience, one-sentence promise, factual sources, CTA, and visual mode before designing slides.
-3. Write the slide plan before rendering. Use one idea per slide and keep the cover to one strong hook.
+2. Establish the audience, the editor's one-sentence claim, factual sources, intended takeaway, CTA, and visual mode before designing slides. A topic is not a claim: turn “AI 시대의 교육 변화 5가지” into a specific point of view the evidence can support.
+3. Write the slide plan before rendering. Build a swipeable argument rather than a list of isolated facts: `claim → tension → story → turn → evidence → interpretation → close`. Let a dense story use two or more short cards instead of shrinking the type.
 4. Create `manifest.json` first. Follow [references/manifest.md](references/manifest.md) and keep every slide file listed there.
 5. Render raster slides at `1080×1350` by default. Use `1080×1440` only when the requested visual direction needs the taller 3:4 canvas. Keep text inside a 72px horizontal and 96px vertical safe area.
 6. Use real, licensed, or user-provided photography when a subject or event is central. Use `$imagegen` only for missing illustrative imagery; render all important text with SVG, HTML/CSS, or another deterministic compositor rather than asking an image model to spell it.
@@ -26,7 +26,7 @@ Create an editorial card-news package that is ready for visual review and can be
    - ask an independent vision or design reviewer to score hook clarity, Korean legibility, hierarchy, slide rhythm, reference fit without copying, and source trust from 1–5 without seeding expected defects;
    - fix every category below 4, render again, and rerun the validator;
    - record the scores, changes, and remaining limits in `qa/report.md`.
-9. Write platform variants. Instagram gets the carousel caption; Threads gets a short lead post plus reply-sized beats. Keep the claim order and sources aligned.
+9. Write platform variants. Instagram gets the carousel caption; Threads gets a short lead post plus reply-sized beats. Keep the claim, story beats, interpretation, and sources aligned.
 10. Read [references/publishing.md](references/publishing.md) before any API or browser publishing. Publish only when the user explicitly asks for it and the required account authorization is already available.
 
 ## Conversation and handoff
@@ -40,22 +40,23 @@ Create an editorial card-news package that is ready for visual review and can be
 
 ## Editorial direction
 
-Use the references as a north star, not as a brand to copy. Default to a photo-led magazine cover, a high-contrast headline over a dark gradient, restrained accent color, and a small consistent brand mark. Prefer:
+Use the references as an editorial north star, never as a brand to copy. Treat the carousel as a small magazine article: its graphic design serves reading, its sequence creates momentum, and the editor's view is visible.
 
-- a concrete Korean hook over an abstract slogan;
-- a human, place, object, or document that gives the story a visual anchor;
-- short headlines, generous line spacing, and one visual hierarchy per slide;
-- a sequence of `hook → context → evidence → implication → action`;
-- a source or verification note when the card makes a current, numerical, political, legal, medical, or financial claim.
+- Start the cover with a concrete, slightly surprising claim, question, or contrast—not a category label or a vague slogan. Make it strong enough to create curiosity but narrow enough that the carousel can prove it.
+- Give the story a visual anchor when one exists: a person, place, object, document, or archival image. When the argument itself is the focus, let typography be the dominant visual instead of adding decoration.
+- Write in short Korean sentences and deliberate line breaks. Use a sentence, contrast, or unanswered question as a slide-ending beat that makes the next swipe feel necessary.
+- Give every slide one job, but allow 2–4 tightly related sentences when the reader needs narrative momentum. Split dense evidence across cards before reducing type size.
+- Separate fact from interpretation. State the editor's reading plainly after the evidence, but never present a value judgment, prediction, or inference as verified fact.
+- Use a source or verification note when the card makes a current, numerical, political, legal, medical, or financial claim.
 
-Choose the least decorative mode that makes the topic clear:
+Choose the least decorative mode that makes the story clear:
 
 - `documentary`: interview, field story, or people-centered issue;
 - `briefing`: announcement, trend, data, or news explainer;
 - `how-to`: checklist, process, or practical tip;
 - `profile`: person, company, book, tool, or case study.
 
-Do not reproduce the reference accounts' logos, watermarks, exact layouts, captions, or imagery. Replace them with the user's brand system and give collaborators credit where required.
+Do not reproduce the reference accounts' logos, watermarks, exact layouts, captions, phrasing, or imagery. Replace them with the user's brand system and give collaborators credit where required. Read [references/visual-direction.md](references/visual-direction.md) before choosing type, imagery, or slide rhythm.
 
 ## Output contract
 
@@ -70,13 +71,15 @@ Return one folder containing at least:
 └── sources.json
 ```
 
-The `manifest.json` is the source of truth for slide order, dimensions, headlines, alt text, platform captions, and sources. Keep generated previews or contact sheets outside the publish list unless the user asks for them.
+The `manifest.json` is the source of truth for slide order, dimensions, headlines, alt text, platform captions, sources, and the editorial claim. Keep generated previews or contact sheets outside the publish list unless the user asks for them.
 
 ## Quality gates
 
 - Do not invent names, dates, prices, eligibility, performance, or quotations.
 - Keep source links close to the claim in `sources.json` and the final caption or source slide.
 - Make every slide understandable without the caption; make every slide describable in `alt` text.
-- Keep the first slide useful as a thumbnail and the final slide useful as a saved reference.
+- Keep the first slide useful as a thumbnail: show the full claim at a glance, with no small explanatory deck competing for attention.
+- Make the final slide a conclusion, invitation, or compact reference worth saving—not a generic “thank you” or engagement prompt.
+- Reject ornamental icons, stickers, charts, gradients, and image treatments that do not clarify the story or improve reading contrast.
 - Do not hide trust signals in unreadable footnotes. Keep slide source labels at least 28px on a 1080px canvas, or move the full citation to the caption and `sources.json`.
 - Do not publish secrets, access tokens, private source URLs, or unapproved sponsored copy.

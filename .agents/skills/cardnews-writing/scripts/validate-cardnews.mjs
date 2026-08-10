@@ -75,6 +75,19 @@ function validateManifest(outputDir, manifestName = "manifest.json") {
   if (!/^[-a-z0-9]+$/.test(manifest.slug ?? "")) errors.push("slug must be lowercase kebab-case.");
   if (!nonEmpty(manifest.title)) errors.push("title is required.");
 
+  const editorial = manifest.editorial;
+  if (!editorial || typeof editorial !== "object" || Array.isArray(editorial)) {
+    errors.push("editorial with claim, reader_takeaway, and narrative_arc is required.");
+  } else {
+    if (!nonEmpty(editorial.claim)) errors.push("editorial.claim is required.");
+    if (!nonEmpty(editorial.reader_takeaway)) errors.push("editorial.reader_takeaway is required.");
+    if (!Array.isArray(editorial.narrative_arc) || editorial.narrative_arc.length < 3) {
+      errors.push("editorial.narrative_arc must contain at least three story beats.");
+    } else if (editorial.narrative_arc.some((beat) => !nonEmpty(beat))) {
+      errors.push("editorial.narrative_arc must contain only non-empty story beats.");
+    }
+  }
+
   const canvas = manifest.canvas;
   const canvasKey = `${canvas?.width}x${canvas?.height}`;
   if (!CANVASES.has(canvasKey)) errors.push("canvas must be 1080x1350 or 1080x1440.");
@@ -146,9 +159,14 @@ function selfTest() {
     for (let index = 1; index <= 4; index += 1) {
       fs.writeFileSync(path.join(root, "slides", `${String(index).padStart(2, "0")}.png`), makeTestPng(1080, 1350));
     }
-    fs.writeFileSync(path.join(root, "manifest.json"), JSON.stringify({
+    const manifest = {
       slug: "self-test",
       title: "자체 검증",
+      editorial: {
+        claim: "좋은 카드뉴스는 주장으로 시작합니다.",
+        reader_takeaway: "한 문장 주장을 먼저 쓴다.",
+        narrative_arc: ["claim", "evidence", "interpretation", "close"],
+      },
       canvas: { width: 1080, height: 1350 },
       slides: [1, 2, 3, 4].map((index) => ({
         file: `slides/${String(index).padStart(2, "0")}.png`,
@@ -158,9 +176,17 @@ function selfTest() {
       })),
       platforms: { instagram: { caption: "캡션" }, threads: { root: "첫 글", replies: [] } },
       sources: [{ label: "self-test", url: "https://example.com" }],
-    }));
+    };
+    fs.writeFileSync(path.join(root, "manifest.json"), JSON.stringify(manifest));
     const result = validateManifest(root);
     if (result.errors.length > 0) throw new Error(result.errors.join("\n"));
+
+    delete manifest.editorial;
+    fs.writeFileSync(path.join(root, "manifest.json"), JSON.stringify(manifest));
+    const missingEditorial = validateManifest(root);
+    if (!missingEditorial.errors.includes("editorial with claim, reader_takeaway, and narrative_arc is required.")) {
+      throw new Error("Missing editorial metadata was not rejected.");
+    }
     console.log("Card-news validator self-test passed.");
   } finally {
     fs.rmSync(root, { recursive: true, force: true });

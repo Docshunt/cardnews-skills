@@ -7,6 +7,11 @@ Create `manifest.json` in the card-news output folder. It is intentionally small
   "slug": "teacher-workflow",
   "title": "교사의 시간을 돌려주는 작은 변화",
   "mode": "how-to",
+  "editorial": {
+    "claim": "교사의 시간을 줄이는 핵심은 새 도구가 아니라 업무 흐름을 다시 설계하는 일입니다.",
+    "reader_takeaway": "이번 주에 바꿀 수 있는 반복 업무 하나를 고른다.",
+    "narrative_arc": ["claim", "tension", "story", "evidence", "interpretation", "close"]
+  },
   "canvas": { "width": 1080, "height": 1350 },
   "slides": [
     {
@@ -52,8 +57,9 @@ Create `manifest.json` in the card-news output folder. It is intentionally small
 ## Required fields
 
 - `slug`: one lowercase kebab-case path segment.
+- `editorial`: record the supported `claim`, the reader's `reader_takeaway`, and the planned `narrative_arc`. Do not substitute a topic label for the claim. The claim can be an argued reading, but it must be distinguishable from the facts in the cards and sources.
 - `canvas`: `1080×1350` is the default shared canvas; `1080×1440` is also accepted for the taller magazine treatment.
-- `slides`: 4–10 ordered raster files. The first slide must have `role: "cover"`; every slide needs `file`, `headline`, and useful `alt` text.
+- `slides`: 4–10 ordered raster files. The first slide must have `role: "cover"`; every slide needs `file`, `headline`, and useful `alt` text. Use narrative roles such as `claim`, `tension`, `story`, `turn`, `evidence`, `interpretation`, and `close` when they make the sequence easier to review.
 - `platforms.instagram.caption`: the final Instagram caption, including CTA and source notes when needed.
 - `platforms.threads.root`: the first Threads post. Keep `replies` short enough to read as a sequence, not as copied Instagram paragraphs.
 - `sources`: at least one source object for the review trail. Use an official or primary source for time-sensitive claims.

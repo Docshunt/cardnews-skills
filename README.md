@@ -1,6 +1,6 @@
 # @docshunt/cardnews-skills
 
-Codex-ready skill for making Korean editorial card news in the visual language of magazine-style Instagram feeds, with a matching Threads publishing package.
+Codex-ready skill for making Korean text-led editorial card news that reads like a short magazine story, with a matching Threads publishing package.
 
 ## Install into Codex
 
