@@ -1,32 +1,27 @@
-# 쉬운 카드뉴스 만들기
+# @docshunt/cardnews-skills
 
-주제나 자료를 주면 Instagram과 Threads에 함께 쓸 수 있는 한국어 카드뉴스를 만들어줍니다. 어려운 작업 방식은 설명하지 않고, 완성된 내용과 확인할 곳만 쉽게 안내합니다.
+Codex-ready skill for making Korean editorial card news in the visual language of magazine-style Instagram feeds, with a matching Threads publishing package.
 
-## 이렇게 말하면 됩니다
+## Install into Codex
 
-- “이 글로 카드뉴스 7장 만들어줘.”
-- “이 사진과 자료를 교사 매거진 느낌으로 정리해줘.”
-- “Instagram 글과 Threads 글도 함께 써줘.”
-- “결과물 보여줘.”
+```bash
+npx skills add Docshunt/cardnews-skills --skill cardnews-writing -a codex
+```
 
-마지막 문장을 말하면 완성된 결과물 폴더가 Finder에서 바로 열립니다.
+Then invoke it with `$cardnews-writing`.
 
-## 함께 준비되는 것
+## Local development
 
-- 세로형 카드뉴스 이미지
-- Instagram에 붙여 넣을 글
-- Threads에 차례로 올릴 글
-- 그림을 보지 못하는 사람을 위한 설명
-- 내용의 근거와 출처
-- 두 차례 이상 살펴보고 보완한 기록
+```bash
+npm test
+python3 /Users/sungwon/.codex/skills/.system/skill-creator/scripts/quick_validate.py .agents/skills/cardnews-writing
+npm run pack:check
+```
 
-## 지키는 약속
+The canonical skill lives at `.agents/skills/cardnews-writing/`. npm packaging is configured through `npmSkills.publish.source` and includes only that skill plus this repository's operating files.
 
-- 이름, 날짜, 가격, 숫자, 인용문을 임의로 만들지 않습니다.
-- 다른 계정의 로고나 디자인을 그대로 베끼지 않습니다.
-- 개인정보와 공개하면 안 되는 자료를 결과물에 넣지 않습니다.
-- 완성된 그림과 글은 내 컴퓨터의 결과물 폴더에만 둡니다.
-- 다음 카드뉴스에도 쓸 수 있는 제작 틀만 공동 보관 공간에 반영합니다.
-- 실제 Instagram·Threads 게시는 사용자가 분명히 요청했을 때만 진행합니다.
+## Output
 
-처음 사용할 때는 Codex에게 “Docshunt/cardnews-skills의 카드뉴스 만들기 도구를 준비해줘”라고 말하면 됩니다.
+The skill creates a manifest, 4:5 raster slides by default, platform-specific captions, alt text, and source tracking. Read the bundled [manifest contract](.agents/skills/cardnews-writing/references/manifest.md) and [publishing notes](.agents/skills/cardnews-writing/references/publishing.md) when a task reaches QA or external publishing.
+
+Actual Meta publishing is intentionally opt-in and credential-gated; the skill does not send publish requests during generation or validation.

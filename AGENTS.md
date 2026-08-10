@@ -27,7 +27,7 @@ This repository publishes one reusable skill: `.agents/skills/cardnews-writing/`
 - Keep internal command output out of user-facing messages. Summarize it in one plain sentence.
 - When the user asks to see the result, resolve the card-news output folder and open that exact folder in macOS Finder with `open <absolute-output-folder>`. Then say only that the result folder was opened.
 - When quality checks pass and no requested changes remain, immediately commit and push only reusable skill, template, and operating-guide changes to `main`. Keep every topic-specific result under `outputs/`, which must remain ignored and untracked. Never force-add anything from `outputs/`.
-- Always keep the root `README.md` as the permanent plain-Korean user guide. Update and share it with reusable template changes; never delete, ignore, or omit it. Do not add a second README inside the skill folder.
+- Always keep the root `README.md` as the permanent project guide. Do not rewrite, delete, ignore, or omit it unless the user explicitly asks. Do not add a second README inside the skill folder.
 
 ## Verification
 
