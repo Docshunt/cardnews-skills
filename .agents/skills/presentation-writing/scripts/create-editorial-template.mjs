@@ -1,5 +1,6 @@
 import path from "node:path";
-import { mkdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { Presentation, PresentationFile } from "@oai/artifact-tool";
 
 const OUTPUT = path.resolve(
@@ -13,6 +14,28 @@ const PLACEHOLDER = "#F1F1ED";
 const MARGIN = 104;
 const FONT_FAMILY = "Pretendard";
 
+async function setThemeFont(pptxPath) {
+  const artifactToolPath = fileURLToPath(
+    import.meta.resolve("@oai/artifact-tool"),
+  );
+  const jszipPath = path.resolve(
+    path.dirname(artifactToolPath),
+    "../../../jszip/lib/index.js",
+  );
+  const { default: JSZip } = await import(pathToFileURL(jszipPath).href);
+  const archive = await JSZip.loadAsync(await readFile(pptxPath));
+  const theme = await archive.file("ppt/theme/theme1.xml").async("string");
+  const updatedTheme = theme.replace(
+    /(<a:(?:latin|ea|cs)\s+typeface=")[^"]+(")/g,
+    "$1Pretendard$2",
+  );
+  archive.file("ppt/theme/theme1.xml", updatedTheme);
+  await writeFile(
+    pptxPath,
+    await archive.generateAsync({ type: "nodebuffer", compression: "DEFLATE" }),
+  );
+}
+
 function textbox(slide, name, text, position, style = {}) {
   const shape = slide.shapes.add({
     geometry: "textbox",
@@ -23,7 +46,7 @@ function textbox(slide, name, text, position, style = {}) {
   });
   shape.text = text;
   shape.text.style = {
-    fontFace: FONT_FAMILY,
+    typeface: FONT_FAMILY,
     fontSize: 28,
     color: INK,
     ...style,
@@ -219,6 +242,7 @@ async function main() {
   addClose(deck);
   const pptx = await PresentationFile.exportPptx(deck);
   await pptx.save(OUTPUT);
+  await setThemeFont(OUTPUT);
   console.log(OUTPUT);
 }
 
