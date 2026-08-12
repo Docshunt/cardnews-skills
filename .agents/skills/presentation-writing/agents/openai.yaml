@@ -1,0 +1,4 @@
+interface:
+  display_name: "에디토리얼 발표자료 만들기"
+  short_description: "사진 자리표시자와 텍스트로 만드는 절제된 16:9 발표자료"
+  default_prompt: "$presentation-writing으로 이 자료를 5장짜리 에디토리얼 발표자료로 만들어줘. 사진은 자리표시자 도형으로 남기고 텍스트와 구도만 완성해줘."

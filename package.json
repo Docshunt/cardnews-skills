@@ -1,7 +1,7 @@
 {
   "name": "@docshunt/cardnews-skills",
   "version": "0.1.0",
-  "description": "Codex-ready Korean editorial card-news skill for Instagram and Threads.",
+  "description": "Codex-ready Korean editorial card-news and presentation skills.",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -28,7 +28,7 @@
   "npmSkills": {
     "publish": {
       "source": ".agents/skills",
-      "export": ["cardnews-writing"]
+      "export": ["cardnews-writing", "presentation-writing"]
     }
   },
   "publishConfig": {

@@ -2,13 +2,13 @@
 
 ## Scope
 
-This repository publishes one reusable skill: `.agents/skills/cardnews-writing/`. Keep that folder portable so it works in Codex and other Agent Skills-compatible tools.
+This repository publishes two reusable skills: `.agents/skills/cardnews-writing/` and `.agents/skills/presentation-writing/`. Keep both folders portable so they work in Codex and other Agent Skills-compatible tools.
 
 ## Source of truth
 
-- Edit `.agents/skills/cardnews-writing/SKILL.md` for the workflow and trigger description.
-- Keep detailed, conditional guidance in that skill's `references/` folder.
-- Keep deterministic checks in that skill's `scripts/` folder.
+- Edit each skill's `SKILL.md` for its workflow and trigger description.
+- Keep detailed, conditional guidance in the matching skill's `references/` folder.
+- Keep deterministic checks and reproducible template builders in the matching skill's `scripts/` folder.
 - Do not create a second copy under `skills/`; `package.json.npmSkills.publish.source` already maps the canonical `.agents/skills` tree for npm-skills packaging.
 
 ## Working rules
@@ -36,6 +36,7 @@ Run these before handoff:
 ```bash
 npm test
 python3 /Users/sungwon/.codex/skills/.system/skill-creator/scripts/quick_validate.py .agents/skills/cardnews-writing
+python3 /Users/sungwon/.codex/skills/.system/skill-creator/scripts/quick_validate.py .agents/skills/presentation-writing
 npm run pack:check
 ```
 
