@@ -1,6 +1,6 @@
 # @docshunt/cardnews-skills
 
-Codex-ready skill for making Korean text-led editorial card news that reads like a short magazine story, with a matching Threads publishing package and seven reusable HTML/CSS card forms.
+Codex-ready skill for making Korean text-led editorial card news that reads like a short magazine story, with a matching Threads publishing package and five reusable photograph-and-type card forms.
 
 ## Install into Codex
 
@@ -22,6 +22,6 @@ The canonical skill lives at `.agents/skills/cardnews-writing/`. npm packaging i
 
 ## Output
 
-The skill creates a manifest, 4:5 raster slides by default, platform-specific captions, alt text, and source tracking. Read the bundled [manifest contract](.agents/skills/cardnews-writing/references/manifest.md) and [publishing notes](.agents/skills/cardnews-writing/references/publishing.md) when a task reaches QA or external publishing.
+The skill creates a manifest, 4:5 raster slides by default, platform-specific captions, alt text, and source tracking. Its bundled page system uses only a full-bleed photo cover, interview quote, text-over-image, image-over-text, and centered close. Read the bundled [manifest contract](.agents/skills/cardnews-writing/references/manifest.md) and [publishing notes](.agents/skills/cardnews-writing/references/publishing.md) when a task reaches QA or external publishing.
 
 Actual Meta publishing is intentionally opt-in and credential-gated; the skill does not send publish requests during generation or validation.

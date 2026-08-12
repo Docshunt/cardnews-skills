@@ -1,79 +1,72 @@
 ---
 name: cardnews-writing
-description: Create Korean text-led editorial card-news carousels and cross-platform publishing packages for Instagram and Threads. Use when turning a topic, article, interview, announcement, product, or source material into an opinionated magazine-style story with slides, captions, alt text, and publish-ready metadata.
+description: Create Korean editorial card-news carousels and cross-platform publishing packages in a restrained photograph-and-type treatment. Use when turning a topic, article, interview, announcement, product, or source material into a readable magazine-style story with slides, captions, alt text, and publish-ready metadata.
 ---
 
 # Card News Writing
 
-Create an editorial card-news package that is ready for visual review and can be published to Instagram and Threads without rewriting the story twice.
+Create a Korean editorial card-news package that feels like a short article cut into pages: a strong cover, documented photographs, calm text pages, and a clear final reading.
 
 ## Workflow
 
-1. Inspect the repository for existing brand assets, fonts, image helpers, output conventions, and source material. Reuse them before adding anything.
-2. Establish the audience, the editor's one-sentence claim, factual sources, intended takeaway, CTA, and visual mode before designing slides. A topic is not a claim: turn “AI 시대의 교육 변화 5가지” into a specific point of view the evidence can support.
-3. Write the slide plan before rendering. Build a swipeable argument rather than a list of isolated facts: `claim → tension → story → turn → evidence → interpretation → close`. Let a dense story use two or more short cards instead of shrinking the type.
-4. Create `manifest.json` first. Follow [references/manifest.md](references/manifest.md), choose a layout primitive for every slide, and keep every slide file listed there.
-5. Start from the bundled [editorial card system](assets/editorial-card-system/). Use its HTML/CSS source as the production base: set the three theme tokens, select the needed primitives, replace the placeholder copy and imagery, then render each card deterministically. Do not invent a new visual treatment for every slide.
-6. Render raster slides at `1080×1350` by default. Use `1080×1440` only when the requested visual direction needs the taller 3:4 canvas. Keep text inside a 72px horizontal and 96px vertical safe area.
-7. Use real, licensed, or user-provided photography when a subject or event is central. Use `$imagegen` only for missing illustrative imagery; render all important text with SVG, HTML/CSS, or another deterministic compositor rather than asking an image model to spell it.
+1. Inspect the workspace for existing brand marks, fonts, image helpers, source material, and output conventions. Reuse them before adding anything.
+2. Establish the reader, the editor's one-sentence claim, factual sources, intended takeaway, CTA, and visual mode. A topic is not a claim: turn `AI 시대의 교육 변화 5가지` into a specific, supportable point of view.
+3. Write a swipeable story before rendering: `claim → setup → complication → evidence → interpretation → close`. Each slide is a paragraph, not an isolated bullet list. Split a dense scene over two slides instead of reducing type.
+4. Create `manifest.json` first. Follow [references/manifest.md](references/manifest.md), select a supplied layout for every slide, and keep every rendered slide listed there.
+5. Start from the bundled [editorial card system](assets/editorial-card-system/). Copy it into the issue folder, select only the forms the story needs, replace the placeholder copy, mark, and photographs, then render. Do not invent a different visual language for every page.
+6. Render at `1080×1350`. Keep explanatory text within 72px left/right and 80px top/bottom, but let evidence photographs run full width when the selected form calls for it.
+7. Use user-provided, licensed, archival, or otherwise verifiable photographs when the subject, person, event, or object is central. Use image generation only when an illustration is genuinely necessary and identify it as an illustration. Render Korean text deterministically, never inside a generated image.
 8. Validate the package:
 
    ```bash
    node .agents/skills/cardnews-writing/scripts/validate-cardnews.mjs outputs/<slug>
    ```
 
-9. Inspect a contact sheet at mobile scale. For reference-led or production-quality work, complete at least two documented review loops:
-   - inspect both the full-size slides and a 320px-wide contact sheet;
-   - ask an independent vision or design reviewer to score hook clarity, Korean legibility, hierarchy, slide rhythm, reference fit without copying, and source trust from 1–5 without seeding expected defects;
-   - fix every category below 4, render again, and rerun the validator;
-   - record the scores, changes, and remaining limits in `qa/report.md`.
-10. Write platform variants. Instagram gets the carousel caption; Threads gets a short lead post plus reply-sized beats. Keep the claim, story beats, interpretation, and sources aligned.
-11. Read [references/publishing.md](references/publishing.md) before any API or browser publishing. Publish only when the user explicitly asks for it and the required account authorization is already available.
+9. Review the rendered carousel twice at full size and as a 320px-wide contact sheet. Check Korean legibility, page rhythm, photograph relevance, type hierarchy, factual/source clarity, and the visual rules below. Fix every issue before handoff and record the review in `qa/report.md`.
+10. Write platform variants. Instagram gets one complete carousel caption; Threads gets a short lead post plus reply-sized beats. Keep the claim, facts, interpretation, and sources aligned.
+11. Read [references/publishing.md](references/publishing.md) before any API or browser publishing. Publish only when the user explicitly asks and the account authorization is available.
 
 ## Conversation and handoff
 
-- Speak to the user only in plain, everyday Korean. Never mention development terms or internal work such as repositories, branches, commits, pushes, packages, manifests, validators, scripts, commands, or runtimes.
-- Report only the useful outcome: what was made, how many cards are ready, whether the checks passed, where the result is saved, and any choice the user still needs to make.
-- Keep the topic-specific images, captions, sources, previews, and reports inside `outputs/<slug>/`. They are local deliverables and must never be tracked or shared with the reusable template.
-- When the user asks to see the result, resolve the absolute `outputs/<slug>` path, run `open <absolute-output-folder>` on macOS, and reply in Korean that the result folder was opened. Do not show the command.
-- When the result meets the requested quality and no change request remains, immediately save only reusable skill, template, root `README.md`, or operating-guide improvements to `main` and share them. Never include `outputs/`, even by force.
-- Keep the root `README.md` permanently as the project guide. Never rewrite, delete, or omit it unless the user explicitly asks, and never create another README inside this skill folder.
+- Speak to the user only in plain, everyday Korean. Never mention internal implementation such as repositories, branches, commits, packages, manifests, validators, scripts, commands, or runtimes.
+- Report only what helps the user: what was made, how many cards are ready, whether review passed, where the result is saved, and any choice still needed.
+- Keep issue-specific images, captions, sources, previews, and review reports inside `outputs/<slug>/`. They are local deliverables and must never be included with the reusable template.
+- When asked to show a result, open the absolute `outputs/<slug>` folder on macOS and say in Korean that the result folder was opened.
+- When reusable material is improved and the request is complete, save and share only reusable skill, template, root `README.md`, or operating-guide improvements. Never include `outputs/`.
+- Keep the root `README.md` permanently as the project guide. Do not create another README inside this skill folder.
 
 ## Editorial direction
 
-Use the references as an editorial north star, never as a brand to copy. Treat the carousel as a small magazine article: its graphic design serves reading, its sequence creates momentum, and the editor's view is visible.
+Use the supplied public references as a reading and composition study, never as a brand to copy. The treatment is documentary and restrained: the reader should notice the photograph and the sentence before they notice a design device.
 
-- Start the cover with a concrete, slightly surprising claim, question, or contrast—not a category label or a vague slogan. Make it strong enough to create curiosity but narrow enough that the carousel can prove it.
-- Give the story a visual anchor when one exists: a person, place, object, document, or archival image. When the argument itself is the focus, let typography be the dominant visual instead of adding decoration.
-- Write in short Korean sentences and deliberate line breaks. Use a sentence, contrast, or unanswered question as a slide-ending beat that makes the next swipe feel necessary.
-- Give every slide one job, but allow 2–4 tightly related sentences when the reader needs narrative momentum. Split dense evidence across cards before reducing type size.
-- Separate fact from interpretation. State the editor's reading plainly after the evidence, but never present a value judgment, prediction, or inference as verified fact.
-- Use a source or verification note when the card makes a current, numerical, political, legal, medical, or financial claim.
-
-Choose the least decorative mode that makes the story clear:
-
-- `documentary`: interview, field story, or people-centered issue;
-- `briefing`: announcement, trend, data, or news explainer;
-- `how-to`: checklist, process, or practical tip;
-- `profile`: person, company, book, tool, or case study.
-
-Do not reproduce the reference accounts' logos, watermarks, exact layouts, captions, phrasing, or imagery. Replace them with the user's brand system and give collaborators credit where required. Read [references/visual-direction.md](references/visual-direction.md) before choosing type, imagery, or slide rhythm.
+- Start the cover with one concrete assertion, reversal, question, or contrast. Avoid course-title framing such as `~하는 5가지`.
+- Write in short Korean sentences. Make line breaks carry meaning and leave an unanswered tension or completed thought at the end of a slide so the next swipe has a reason.
+- Put observed facts before the editor's interpretation. A conclusion can be personal or assertive, but distinguish it clearly from documented fact.
+- Use photographs as evidence: a person, scene, archival image, product, place, or primary document. Do not use unrelated stock atmosphere merely to decorate a page.
+- Use `interview` mode for quotation-led stories and `profile` mode for people or companies. A briefing or how-to story can use the same text-and-evidence forms when it has real visual material.
+- Read [references/visual-direction.md](references/visual-direction.md) before selecting typography, image placement, or page rhythm.
 
 ## Layout system
 
-Use the seven bundled primitives, not a different template for each page:
+Use the five supplied forms. They are intentionally narrow because repetition is the visual identity.
 
-- `cover`: one strong claim with either a dominant image or a type-led field;
-- `statement`: one short editorial assertion or transition;
-- `text`: a readable paragraph card with a stable left edge;
-- `photo-text`: one evidence-bearing image with a short caption or claim;
-- `quote`: a source-attributed quotation with enough whitespace to feel deliberate;
-- `data`: one number, comparison, or compact evidence set—never a dashboard;
-- `closing`: the thought, implication, or reference the reader should retain.
+- `cover`: one full-bleed photograph, a lower dark gradient, and a 2–4 line white claim.
+- `interview-quote`: a framed portrait or scene on quiet paper, followed by a centered direct quotation.
+- `text-image`: black editorial copy in the upper half and one full-width evidence photograph below.
+- `image-text`: one full-width evidence photograph above and black editorial copy below.
+- `centered-close`: a generous white or paper page with the final reading centered in the middle.
 
-Use the same canvas, grid, masthead, page number, type scale, and three colour tokens across the whole carousel. Default to 2–4 primitive types in a 6–8 slide story; repeat `text`, `statement`, or `photo-text` when the narrative needs it. Change a layout only to clarify a new kind of evidence or create a meaningful turning point.
+Default story rhythm is `cover → text-image/image-text → text-image/image-text → centered-close`. Use `interview-quote` repeatedly in an interview issue. Do not add decorative “statement”, “data”, masthead, page-number, category-label, or CTA pages simply to make a carousel longer.
 
-Copy `assets/editorial-card-system/` into the card-news working folder before editing. Its `card.css` contains the tokens and shared geometry; each named HTML file is one renderable 1080×1350 page. Do not put text inside a generated image. Set `--background`, `--ink`, and `--accent` once per issue, then change them only for intentional photo contrast.
+Across the issue:
+
+- Use black, white, and the colors already present in the photograph. The only non-photo surface variation is an almost-white, subtle paper texture. Do not introduce an accent colour, graphic badge, chart, icon, sticker, border treatment, or large logo.
+- Do not add a page number, masthead, eyebrow label, or footer by default. A small user-owned publication mark may appear at the bottom of a cover and, sparingly, at the lower edge of a story page.
+- Headlines use a heavy sans-serif. Reading text uses the same sans-serif. Interview quotations may use a Korean serif. Do not mix decorative display typefaces.
+- Underline only the sentence that carries the factual turn or interpretation. The underline is black, straight, and typographic—not a marker stroke or coloured highlight.
+- Preserve empty space. The cover is image-led; quote pages have a small framed image and generous quiet space; story pages divide text and image in clear horizontal blocks; the close is centered and unhurried.
+
+Copy `assets/editorial-card-system/` into the issue folder before editing. `card.css` holds the shared canvas and type rules; every named HTML file is a renderable page. Replace the `BRAND` placeholder with a user-owned mark or remove it. Do not put copy inside a generated photograph.
 
 ## Output contract
 
@@ -88,15 +81,16 @@ Return one folder containing at least:
 └── sources.json
 ```
 
-The `manifest.json` is the source of truth for slide order, dimensions, headlines, alt text, platform captions, sources, and the editorial claim. Keep generated previews or contact sheets outside the publish list unless the user asks for them.
+`manifest.json` is the source of truth for slide order, dimensions, headlines, alt text, platform captions, sources, and the editorial claim. Keep generated previews and contact sheets out of the publish list unless the user asks for them.
 
 ## Quality gates
 
-- Do not invent names, dates, prices, eligibility, performance, or quotations.
-- Keep source links close to the claim in `sources.json` and the final caption or source slide.
-- Make every slide understandable without the caption; make every slide describable in `alt` text.
-- Keep the first slide useful as a thumbnail: show the full claim at a glance, with no small explanatory deck competing for attention.
-- Make the final slide a conclusion, invitation, or compact reference worth saving—not a generic “thank you” or engagement prompt.
-- Reject ornamental icons, stickers, charts, gradients, and image treatments that do not clarify the story or improve reading contrast.
-- Do not hide trust signals in unreadable footnotes. Keep slide source labels at least 28px on a 1080px canvas, or move the full citation to the caption and `sources.json`.
-- Do not publish secrets, access tokens, private source URLs, or unapproved sponsored copy.
+- Do not invent names, dates, prices, eligibility, performance, quotations, or visual evidence.
+- Keep a source trail for time-sensitive, numerical, political, legal, medical, or financial claims.
+- Make every slide understandable without its caption and describable in useful alt text.
+- At 320px wide, the cover claim must be readable immediately; body copy must remain comfortably readable. Split copy before shrinking it.
+- Keep the full-bleed cover photo free of a busy logo stack. Place white type over the dark lower gradient, never across a face when a crop can avoid it.
+- On an interview page, center one bordered photograph above the quote. On an explanatory page, use a crisp horizontal divide between the white copy block and the edge-to-edge photograph.
+- Make the final slide a conclusion or implication worth saving, not a generic thank-you or engagement prompt.
+- Reject any page that gains its hierarchy from a coloured accent, a template label, a page number, a decorative illustration, a gradient other than photo contrast, or a fake statistic.
+- Do not publish secrets, private source URLs, or unapproved sponsored copy.

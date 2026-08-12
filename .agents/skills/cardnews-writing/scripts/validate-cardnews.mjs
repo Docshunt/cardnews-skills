@@ -4,8 +4,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-const CANVASES = new Set(["1080x1350", "1080x1440"]);
-const LAYOUTS = new Set(["cover", "statement", "text", "photo-text", "quote", "data", "closing"]);
+const CANVASES = new Set(["1080x1350"]);
+const LAYOUTS = new Set(["cover", "interview-quote", "text-image", "image-text", "centered-close"]);
 const JPEG_SOFS = new Set([
   0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf,
 ]);
@@ -94,14 +94,14 @@ function validateManifest(outputDir, manifestName = "manifest.json") {
     errors.push("design with editorial-card-system tokens is required.");
   } else {
     if (design.system !== "editorial-card-system") errors.push("design.system must be editorial-card-system.");
-    for (const token of ["background", "ink", "accent"]) {
+    for (const token of ["surface", "ink", "photo_overlay"]) {
       if (!nonEmpty(design[token])) errors.push(`design.${token} is required.`);
     }
   }
 
   const canvas = manifest.canvas;
   const canvasKey = `${canvas?.width}x${canvas?.height}`;
-  if (!CANVASES.has(canvasKey)) errors.push("canvas must be 1080x1350 or 1080x1440.");
+  if (!CANVASES.has(canvasKey)) errors.push("canvas must be 1080x1350.");
 
   if (!Array.isArray(manifest.slides) || manifest.slides.length < 4 || manifest.slides.length > 10) {
     errors.push("slides must contain 4–10 ordered items for Instagram-safe publishing.");
@@ -182,15 +182,15 @@ function selfTest() {
       },
       design: {
         system: "editorial-card-system",
-        background: "#F6F2EA",
+        surface: "#FCFCFA",
         ink: "#171717",
-        accent: "#C94B32",
+        photo_overlay: "rgba(0, 0, 0, .74)",
       },
       canvas: { width: 1080, height: 1350 },
       slides: [1, 2, 3, 4].map((index) => ({
         file: `slides/${String(index).padStart(2, "0")}.png`,
         role: index === 1 ? "cover" : "body",
-        layout: index === 1 ? "cover" : "text",
+        layout: index === 1 ? "cover" : "text-image",
         headline: `카드 ${index}`,
         alt: `카드 ${index} 설명`,
       })),
@@ -222,9 +222,9 @@ function selfTest() {
 
     manifest.design = {
       system: "editorial-card-system",
-      background: "#F6F2EA",
+      surface: "#FCFCFA",
       ink: "#171717",
-      accent: "#C94B32",
+      photo_overlay: "rgba(0, 0, 0, .74)",
     };
     manifest.slides[1].layout = "poster";
     fs.writeFileSync(path.join(root, "manifest.json"), JSON.stringify(manifest));

@@ -1,72 +1,79 @@
 # Visual direction
 
-Use this guide for a Korean text-led editorial magazine treatment inspired by the reading grammar of public feeds such as [dy1](https://www.instagram.com/dy1.mag/). Learn the grammar; never imitate a particular post, layout, logo, caption, or image.
+This is a reference-led visual grammar for Korean editorial carousels. It studies the provided examples' restraint, photo placement, and reading rhythm. It does not authorize copying another publisher's logo, exact post, phrase, photo, or brand mark.
 
-## Editorial reading grammar
+## The visual grammar
 
-The carousel should feel like a short article cut into pages, not a presentation decorated for social media.
+The visual identity comes from a small number of repeated page shapes.
 
-- Open with an assertion that creates a small intellectual gap: an unexpected actor, a reversal, a tension, or a provocative but supportable reading.
-- Make each card a paragraph in a continuous narrative. A reader should be able to explain why the next card follows from the one before it.
-- Use the story's turning point as a visual and verbal reset: `하지만`, `문제는`, `기회를 준 것은`, `그래서`, or an equivalent transition only when it is true to the evidence.
-- Move from observed facts to the editor's interpretation in that order. The conclusion may be personal, but its boundary must be clear.
-- End with a thought the reader can carry away, a grounded implication, or a useful source trail. Avoid generic calls to like, follow, or comment unless they serve the story.
+- A cover is a photograph first and a statement second: one full-frame image, a dark lower fade for legibility, then a bold white claim near the lower-left edge.
+- An interview page is quiet: an off-white paper field, one modest bordered photo, one centered direct quote, and a great deal of unfilled space.
+- A profile or business story is documentary: a white copy block and a full-width evidence photograph meet on a clean horizontal line. The two blocks switch order, but their proportions remain familiar.
+- A close is calm and centered. It receives no visual reward other than white space and the weight of its sentence.
+- The color system is almost absent. Black typography, white or slightly warm paper, and the photograph's own colors are enough.
 
-## Cover and typography
+Do not add a generic header, page count, category label, footer, graphic shape, colourful underline, icon, sticker, or ornamental chart. The only optional repeating element is a small user-owned mark, placed at the bottom of a cover or discreetly near a lower page edge.
 
-Choose one of two cover treatments; do not combine both unless the topic truly needs it.
+## Five page forms
 
-1. **Image-led cover:** Use one strong portrait, place, object, or document. Apply only enough darkening or gradient to make type readable. Place a bold headline in the lower third or a quiet area of the image.
-2. **Type-led cover:** Use a calm cream, white, black, or brand-color field when the claim itself is the visual. Let the headline occupy the space; do not add stock icons, unrelated illustrations, or decorative shapes to fill it.
-
-For either treatment:
-
-- Write the cover in 1–3 compact lines. Prefer declarative language over a course-title construction such as `~하는 5가지`.
-- Use one display typeface and one reading typeface at most. Let scale, weight, whitespace, and line breaks make the hierarchy.
-- Keep a stable left edge and page rhythm across text cards. Use large margins and intentional empty space rather than scattered alignment.
-- Treat line breaks as pacing. Break after the meaningful word or contrast, not merely to make the box look balanced.
-- Use images as evidence or atmosphere, not interchangeable backgrounds. Crop for the subject and preserve enough negative space for the headline.
-- Keep a small, unobtrusive publication mark in one consistent position if the user has a brand. Never place it over a face or the key evidence.
-
-## Reusable forms
-
-Use the actual HTML/CSS sources in [`../assets/editorial-card-system/`](../assets/editorial-card-system/) instead of rebuilding pages from scratch. It has exactly seven forms: `cover`, `statement`, `text`, `photo-text`, `quote`, `data`, and `closing`.
-
-- Reuse the same margin, masthead, page number, type scale, and colour tokens on every card.
-- Keep a six-to-eight card issue to two-to-four of these forms. Repetition is the visual identity; variation earns its place only when the evidence changes from prose to image, quotation, or data.
-- Use `statement` for a pivot sentence, not as a second cover. Use `data` for one revealing number or comparison, not a miniature report. Use `quote` only with an attributable source.
-- Put the text in the supplied HTML and style it through variables. Do not rasterize copy into photos, generate spellings with an image model, or use decorative elements to disguise a weak hierarchy.
-- Use a light base by default. Let an image-led `cover` or `photo-text` card borrow a dark treatment solely for contrast, then return to the same issue tokens.
-
-## Slide rhythm
-
-Use 6–8 slides by default. Adapt this backbone; do not force every story into every role.
-
-| Role | Reader's question | Typical content |
+| Form | Composition | Use it for |
 | --- | --- | --- |
-| `claim` | 왜 이 이야기를 봐야 하지? | One clear assertion, contrast, or question. |
-| `tension` | 무슨 일이 있었나? | The problem, stake, or surprising setup. |
-| `story` | 어떻게 여기까지 왔나? | A scene, sequence, or human detail. |
-| `turn` | 무엇이 바뀌었나? | The reversal, decision, or unexpected actor. |
-| `evidence` | 그 해석을 믿을 근거는? | Specific fact, quotation, data, or source-backed detail. |
-| `interpretation` | 그래서 무슨 뜻인가? | The editor's clearly labeled reading. |
-| `close` | 나는 무엇을 가져가나? | A concise conclusion, implication, or saving-worthy reference. |
+| `cover` | Full-bleed photo; dark gradient in the lower 42%; white 2–4 line headline in the lower-left; small mark near bottom center. | A person, company, event, or object with one recognisable image. |
+| `interview-quote` | Very light paper field; bordered landscape photo about 74% of canvas width in the upper-middle; centered Korean serif quote below. | A real, attributable interview sentence. |
+| `text-image` | White copy block in the upper 51%; full-width image in the lower 49%. | Setup, chronology, a decision, or evidence followed by the person/place that anchors it. |
+| `image-text` | Full-width image in the upper 52%; white copy block in the lower 48%. | A photograph that creates the first beat, then explanation or interpretation. |
+| `centered-close` | Quiet white/paper field; title, compact explanation, and key sentence centered around the middle. | The final thought or grounded implication. |
 
-Keep body copy readable at a 320px-wide preview. If a card needs more than roughly four short sentence lines or one compact quote/data block, split it. A sparse card after a dense factual card is useful rhythm, not wasted space.
+Use two or three of these forms repeatedly in one issue. A 7-slide profile can be `cover → text-image → image-text → text-image → image-text → image-text → centered-close`. An interview issue can alternate `cover` and several `interview-quote` pages before the close.
 
-## House defaults
+## Type and copy placement
 
-Start with these values, then adapt to the user's brand:
+- Use one Korean sans-serif family for headings and explanatory text. A Korean serif is allowed only for the voice of an interview quote.
+- Cover title: 92–112px, weight 800–900, line-height 1.06–1.12, left-aligned. Do not add a deck or an eyebrow.
+- Story heading: 58–66px, weight 800–900, line-height 1.20. Number it only when the issue needs a chronological sequence, such as `3. 두 번째 회사도, 첫 게임부터 망합니다.`
+- Story body: 31–35px, line-height 1.55–1.65, left-aligned. Keep paragraphs short and leave a visible gap between them.
+- Emphasis: bold one full sentence or phrase, then give it a straight black underline. It should represent the turn, fact, or conclusion—not a decorative highlight.
+- Interview quote: 42–48px, Korean serif, centered, line-height 1.55–1.65. Include quotation marks only when they improve clarity; do not invent an attribution.
+- Closing title: 54–64px, bold and centered. Closing explanation: 34–40px. The final emphasized sentence can be bold and underlined.
+
+The title and body do not need to fill every available space. Split text before making it smaller than the stated range.
+
+## Photography and crop
+
+- Choose real photographs with a visible subject: portrait, speaking scene, archive image, office, product, documentary environment, or primary document.
+- For covers, reserve a dark or uncluttered lower zone for type. Crop so the title avoids the face; a lower gradient can create the needed contrast, but it must not look like a graphic effect.
+- For story pages, the photo runs exactly edge to edge in its half of the card. Do not round its corners or put it inside a decorative frame.
+- For interview-quote pages, use the one intentional thin black frame. Favor a landscape crop around `800×480–520px`; keep it in the upper-to-middle part of the card rather than near the top edge.
+- Use black-and-white photography only when it belongs to the source material or makes a consistent interview sequence. Never apply it as a generic retro filter.
+- Credit images in the caption, source list, or a readable source page; do not sacrifice the visual form to a tiny illegible credit line.
+
+## Surface, spacing, and marks
 
 ```text
-canvas: 1080×1350
-safe area: 72px left/right, 96px top/bottom
-slides: 6–8
-cover headline: 96–144px, 1–3 lines
-body: 34–42px for swipe-reading at 320px; split copy before reducing the size
-source labels: 28px minimum; keep full URLs in the caption or sources file
-accent: one color only, unless the brand already has a palette
-mark: one small placement, never over the subject or key evidence
+canvas:              1080 × 1350
+story copy inset:    72px left/right; 74–88px top/bottom
+cover copy inset:    72px left/right; lower 120px reserved for mark / breathing room
+story block split:   roughly 51 / 49 or 52 / 48
+quote photo width:   800px
+quote photo height:  480–520px
+quote photo border:  2px solid black
+paper surface:       #FCFCFA with extremely subtle monochrome grain only
+ink:                 #111111
+cover fade:          transparent through the upper half; near-black at the bottom
 ```
 
-Use a light editorial base for type-led arguments and explanatory cards. Use a photo-plus-contrast treatment for profiles, scenes, and archival evidence. Keep the claim legible in a 320px-wide thumbnail preview before adding secondary information.
+The paper grain must disappear at ordinary phone distance; it is texture, not a background graphic. Use no coloured fill or accent just to make a page “pop.”
+
+## Review checklist
+
+At full-size and at 320px wide, reject and revise if any answer is no:
+
+- Does the cover read as one declarative sentence before any secondary element?
+- Is every photo visual evidence rather than filler?
+- Does each page clearly belong to one of the five forms?
+- Is the text/image divide straight, decisive, and free of added frames or decoration?
+- Are black underlines reserved for meaningful emphasis?
+- Is the interview page substantially quieter than the cover and story pages?
+- Could a reader identify the headline and first paragraph without zooming?
+- Have page numbers, mastheads, colored accents, stickers, and invented data been removed?
+- Does the user-owned mark remain small and never compete with the claim or photo subject?

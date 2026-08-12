@@ -7,14 +7,11 @@
     <title>Cover</title>
   </head>
   <body>
-    <article class="card card--cover" style="--background:#F6F2EA; --ink:#171717; --accent:#C94B32;">
-      <!-- For an image-led cover, add `is-photo`, then place card__photo and card__scrim directly inside this article. -->
-      <header class="card__masthead"><span class="card__brand">YOUR MAGAZINE</span><span class="card__section">IDEAS</span></header>
-      <div class="card__cover-copy">
-        <p class="card__eyebrow">한 문장 주장</p>
-        <h1 class="card__title">이 카드가<br><strong>말하려는 것</strong>은<br>무엇인가</h1>
-      </div>
-      <footer class="card__footer"><span>짧은 부제는 생략해도 됩니다</span><span class="card__page">01</span></footer>
+    <article class="card card--cover" style="--photo-position:center;">
+      <div class="cover__photo"><img class="card__photo" src="photo.jpg" alt="이야기의 주인공 또는 핵심 장면"></div>
+      <div class="cover__fade"></div>
+      <h1 class="cover__copy">가장 큰 회사는<br>가장 조용할<br>수도 있습니다</h1>
+      <p class="card__mark card__mark--cover">BRAND</p>
     </article>
   </body>
 </html>
