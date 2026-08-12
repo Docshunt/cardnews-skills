@@ -30,7 +30,7 @@ For a five-slide deck, use `opening → text-image → image-text → quote → 
 
 ## Text and image rules
 
-- Use a heavy Korean sans-serif for titles and the same sans-serif for reading text. Use a Korean serif only for the direct voice of an attributable quotation.
+- Use Pretendard for every visible Korean text element: titles, body copy, quotations, source lines, and image-placeholder labels. Vary weight, size, and alignment instead of changing typeface.
 - Keep opening titles to 2–4 short lines. Keep slide titles declarative and bodies brief; cut or split copy before reducing type below the sizes in the visual direction.
 - Bold and underline only the factual turn, interpretation, or final reading. Keep the underline black, straight, and typographic.
 - Treat a future photograph as evidence: specify a person, scene, object, document, or place directly related to the slide's message. Do not request decorative stock atmosphere.

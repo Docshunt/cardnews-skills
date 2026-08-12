@@ -11,6 +11,7 @@ const INK = "#111111";
 const PAPER = "#FCFCFA";
 const PLACEHOLDER = "#F1F1ED";
 const MARGIN = 104;
+const FONT_FAMILY = "Pretendard";
 
 function textbox(slide, name, text, position, style = {}) {
   const shape = slide.shapes.add({
@@ -22,7 +23,7 @@ function textbox(slide, name, text, position, style = {}) {
   });
   shape.text = text;
   shape.text.style = {
-    fontFace: "Pretendard",
+    fontFace: FONT_FAMILY,
     fontSize: 28,
     color: INK,
     ...style,
@@ -115,7 +116,6 @@ function addQuote(deck) {
     "“한 문장 인용은\n문제를 선명하게 만듭니다.”",
     { left: MARGIN, top: 270, width: 530, height: 210 },
     {
-      fontFace: "Noto Serif KR",
       fontSize: 44,
       alignment: "center",
     },
