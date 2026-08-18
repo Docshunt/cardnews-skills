@@ -103,8 +103,8 @@ function validateManifest(outputDir, manifestName = "manifest.json") {
   const canvasKey = `${canvas?.width}x${canvas?.height}`;
   if (!CANVASES.has(canvasKey)) errors.push("canvas must be 1080x1350.");
 
-  if (!Array.isArray(manifest.slides) || manifest.slides.length < 4 || manifest.slides.length > 10) {
-    errors.push("slides must contain 4–10 ordered items for Instagram-safe publishing.");
+  if (!Array.isArray(manifest.slides) || manifest.slides.length < 2 || manifest.slides.length > 20) {
+    errors.push("slides must contain 2–20 ordered items. Choose the count from the completed story, not a template quota.");
   }
 
   if (Array.isArray(manifest.slides)) {
@@ -155,6 +155,25 @@ function validateManifest(outputDir, manifestName = "manifest.json") {
   if (!Array.isArray(manifest.platforms?.threads?.replies)) warnings.push("platforms.threads.replies is missing; use [] for a text-only handoff.");
   if (!Array.isArray(manifest.sources) || manifest.sources.length === 0) errors.push("sources must contain at least one source.");
 
+  const editablePptx = manifest.editable_pptx;
+  if (!editablePptx || typeof editablePptx !== "object" || Array.isArray(editablePptx)) {
+    errors.push("editable_pptx with a relative .pptx file is required.");
+  } else if (!nonEmpty(editablePptx.file)) {
+    errors.push("editable_pptx.file is required.");
+  } else {
+    const relativeDeck = String(editablePptx.file);
+    const deckPath = path.resolve(root, relativeDeck);
+    if (path.isAbsolute(relativeDeck) || !isInside(root, deckPath)) {
+      errors.push(`editable_pptx.file must stay inside the output folder: ${relativeDeck}`);
+    } else if (!/\.pptx$/i.test(deckPath)) {
+      errors.push("editable_pptx.file must end in .pptx.");
+    } else if (!fs.existsSync(deckPath)) {
+      errors.push(`editable_pptx.file does not exist: ${relativeDeck}`);
+    } else if (fs.statSync(deckPath).size === 0) {
+      errors.push(`editable_pptx.file is empty: ${relativeDeck}`);
+    }
+  }
+
   return { errors, warnings, manifest };
 }
 
@@ -172,6 +191,7 @@ function selfTest() {
     for (let index = 1; index <= 4; index += 1) {
       fs.writeFileSync(path.join(root, "slides", `${String(index).padStart(2, "0")}.png`), makeTestPng(1080, 1350));
     }
+    fs.writeFileSync(path.join(root, "self-test-editable.pptx"), "PPTX");
     const manifest = {
       slug: "self-test",
       title: "자체 검증",
@@ -187,6 +207,7 @@ function selfTest() {
         photo_overlay: "rgba(0, 0, 0, .74)",
       },
       canvas: { width: 1080, height: 1350 },
+      editable_pptx: { file: "self-test-editable.pptx" },
       slides: [1, 2, 3, 4].map((index) => ({
         file: `slides/${String(index).padStart(2, "0")}.png`,
         role: index === 1 ? "cover" : "body",
@@ -231,6 +252,14 @@ function selfTest() {
     const invalidLayout = validateManifest(root);
     if (!invalidLayout.errors.some((error) => error.startsWith("slides[1].layout must be one of:"))) {
       throw new Error("Invalid layout was not rejected.");
+    }
+
+    manifest.slides[1].layout = "text-image";
+    manifest.editable_pptx = { file: "slides/01.png" };
+    fs.writeFileSync(path.join(root, "manifest.json"), JSON.stringify(manifest));
+    const invalidDeck = validateManifest(root);
+    if (!invalidDeck.errors.includes("editable_pptx.file must end in .pptx.")) {
+      throw new Error("Non-PPTX editable deck was not rejected.");
     }
     console.log("Card-news validator self-test passed.");
   } finally {

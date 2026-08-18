@@ -1,4 +1,4 @@
 interface:
   display_name: "에디토리얼 카드뉴스 만들기"
-  short_description: "주장과 이야기로 읽히는 Instagram·Threads 카드뉴스"
-  default_prompt: "$cardnews-writing으로 이 자료를 Instagram과 Threads용 에디토리얼 카드뉴스로 만들어줘. 한 문장 주장으로 시작해 이야기와 해석으로 풀고, 완성되면 결과물 폴더를 열어줘."
+  short_description: "이미지와 수정 가능한 PPT까지 만드는 에디토리얼 카드뉴스"
+  default_prompt: "$cardnews-writing으로 이 자료를 Instagram과 Threads용 에디토리얼 카드뉴스로 만들어줘. 한 문장 주장으로 시작해 이야기와 해석으로 풀고, 업로드용 이미지와 수정 가능한 세로 PPT를 함께 만들어줘."

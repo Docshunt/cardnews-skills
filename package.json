@@ -28,7 +28,7 @@
   "npmSkills": {
     "publish": {
       "source": ".agents/skills",
-      "export": ["cardnews-writing", "presentation-writing"]
+      "export": ["blog-writing", "cardnews-writing", "presentation-writing"]
     }
   },
   "publishConfig": {

@@ -2,7 +2,7 @@
 
 ## Scope
 
-This repository publishes two reusable skills: `.agents/skills/cardnews-writing/` and `.agents/skills/presentation-writing/`. Keep both folders portable so they work in Codex and other Agent Skills-compatible tools.
+This repository publishes three reusable skills: `.agents/skills/blog-writing/`, `.agents/skills/cardnews-writing/`, and `.agents/skills/presentation-writing/`. Keep every folder portable so they work in Codex and other Agent Skills-compatible tools.
 
 ## Source of truth
 
@@ -35,8 +35,9 @@ Run these before handoff:
 
 ```bash
 npm test
-python3 /Users/sungwon/.codex/skills/.system/skill-creator/scripts/quick_validate.py .agents/skills/cardnews-writing
-python3 /Users/sungwon/.codex/skills/.system/skill-creator/scripts/quick_validate.py .agents/skills/presentation-writing
+python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py" .agents/skills/cardnews-writing
+python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py" .agents/skills/blog-writing
+python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py" .agents/skills/presentation-writing
 npm run pack:check
 ```
 
