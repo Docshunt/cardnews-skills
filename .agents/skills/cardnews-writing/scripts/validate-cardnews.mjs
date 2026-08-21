@@ -286,7 +286,7 @@ function main(argv) {
     process.exitCode = 1;
     return;
   }
-  console.log(`Card-news OK: ${result.manifest.slides.length} slides, ${result.manifest.canvas.width}x${result.manifest.canvas.height}, package complete.`);
+  console.log(`Card-news package structure OK: ${result.manifest.slides.length} slides, ${result.manifest.canvas.width}x${result.manifest.canvas.height}. Visual quality still requires full-size and 320px review.`);
   if (result.warnings.length > 0) console.warn(result.warnings.map((warning) => `WARN: ${warning}`).join("\n"));
 }
 

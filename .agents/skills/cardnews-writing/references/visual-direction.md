@@ -11,13 +11,15 @@ Observed on 2026-08-10 from the public feeds of [교생지](https://www.instagra
 - Captions add context, source framing, a question or CTA, and a compact hashtag set.
 - Posts mix interviews, field observations, explainers, tools, and timely issues rather than using one template for every story.
 
-The supplied deck is a useful quality bar:
+When the user says the result must match the supplied deck, use it as the acceptance benchmark. It is not enough to borrow the palette or make a neat carousel:
 
 - Use a 1080×1350 portrait canvas with a decisive cover, large short headlines, and generous white space.
 - Alternate visual bands so the sequence breathes: full-bleed cover, white text section with an image band, image-led section with text below, evidence or product-screen section, and a centered close.
 - Let one visual prove the current sentence. A product screen, real photograph, or chart belongs only when it advances the claim.
 - Keep the close sparse and memorable: a principle or next action first, a small logo second.
 - Preserve editability. The reference deck reads as text, image, overlay, and logo objects—not one baked slide image.
+
+The nine-slide reference demonstrates the expected rhythm: a full-bleed hook, alternating text-and-visual evidence cards, then one or two sparse centered closing cards. Do not force every story to nine slides; preserve the same pacing, information density, and finish. A card that is technically valid but cramped, visually flat, generic, or not independently editable is below the target.
 
 ## 교생지 signal
 
@@ -58,6 +60,8 @@ mark: one small placement, never over the subject
 ```
 
 Use a cream/white editorial base for how-to and briefing cards, and a photo-plus-gradient treatment for documentary and profile cards. For the reference-led treatment, use a full-bleed cover with a separate dark lower fade, clean black text on white body sections, and a small replaceable logo PNG.
+
+For the supplied deck's level of finish, use near-white body backgrounds (`#FCFCFA`), near-black text (`#111111`), Pretendard or the user's equivalent Korean sans, one restrained accent, and a clear type ladder: cover around 84–112px, body headline around 58–66px, body around 31–38px, and source labels at least 28px. These are starting values, not permission to shrink a crowded card; shorten copy or change the composition first.
 
 ## Layout primitives
 

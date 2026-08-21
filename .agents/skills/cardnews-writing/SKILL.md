@@ -9,7 +9,7 @@ Create one source-backed package that keeps the story, evidence, images, editabl
 
 ## Workflow
 
-1. Inspect the available brand assets, fonts, logo PNGs, existing templates, source files, and output conventions. Reuse them before designing anything. Treat a supplied deck as a visual quality reference unless the user explicitly asks to follow it as a template.
+1. Inspect the available brand assets, fonts, logo PNGs, existing templates, source files, and output conventions. Reuse them before designing anything. When the user supplies a PPTX as the target quality, treat its rendered slides and editable object structure as the acceptance benchmark—not optional inspiration. Match its hierarchy, density, typography, slide rhythm, evidence use, whitespace, and editability without copying its proprietary copy, logo, exact layout, or imagery.
 2. Lock the brief in one line each before writing:
    - reader: who needs this;
    - editorial claim: the one sentence the carousel must prove;
@@ -24,7 +24,7 @@ Create one source-backed package that keeps the story, evidence, images, editabl
 5. Write the slide plan before rendering. Use one narrative job per slide and a cumulative flow such as `cover → context → story/evidence → complexity → interpretation → application → close`. HSO means a useful hook, a story that earns the conclusion, and a practical saved principle or next action—not a forced sales line. Keep the slide count flexible; remove repeated beats before adding cards.
 6. Create `manifest.json` first. Follow [references/manifest.md](references/manifest.md), link each slide to its layout and source IDs, then create the copy-only `text.json` and image replacement map `image-plan.json`.
 7. Source images in this order: user-provided originals, commissioned or self-shot work, official press or product assets, official video stills, licensed stock or public-domain material, then AI illustration. Use real originals for real people, companies, products, interfaces, events, statistics, and evidence. Use AI only for abstract concepts or non-factual atmosphere. Keep an unconfirmed image as a placeholder until its original and usage status are verified. Never bake final Korean copy into an AI image.
-8. Build an editable 4:5 PPT. Keep each headline, body, emphasis, source label, logo PNG, photo, and overlay as a separately selectable object; keep the image and dark gradient separate on a cover; never use a flattened card image as the slide background. Read [references/visual-direction.md](references/visual-direction.md) before choosing the visual treatment.
+8. Build the editable 4:5 PPT as the primary authoring result, then export the PNGs from that same file. For PPTX authoring, follow the installed presentation workflow: use the bundled workspace dependencies and `@oai/artifact-tool` from JavaScript, render every slide, inspect each one, and fix overlap, clipping, wrapping, and empty placeholders before delivery. Keep each headline, body, emphasis, source label, logo PNG, photo, and overlay as a separately selectable object; keep the image and dark gradient separate on a cover; never use a flattened card image as the slide background. Read [references/visual-direction.md](references/visual-direction.md) before choosing the visual treatment.
 9. Render every slide at `1080×1350` by default (`1080×1440` only when the taller 3:4 treatment is intentional). Keep text within a 72px horizontal and 96px vertical safe area. Preserve the original image and the cropped or corrected used image under `images/originals/` and `images/used/`, and record the source and rights status.
 10. Validate and review the complete package:
 
@@ -32,7 +32,7 @@ Create one source-backed package that keeps the story, evidence, images, editabl
    node .agents/skills/cardnews-writing/scripts/validate-cardnews.mjs outputs/<slug>
    ```
 
-   Inspect every slide at full size and a 320px-wide contact sheet. Check that the cover hook is readable, each page has one job, facts and interpretation are distinguishable, images directly support the sentence, Korean line breaks are natural, no text objects overlap, the PPT objects remain selectable, and both full-size and thumbnail reads work. Have an independent vision or design pass score content, image provenance, hierarchy, legibility, rhythm, editability, and reference fit from 1–5; fix every score below 4 and record scores, changes, and remaining limits in `qa/report.md`.
+   Inspect every slide at full size and a 320px-wide contact sheet. Check that the cover hook is readable, each page has one job, facts and interpretation are distinguishable, images directly support the sentence, Korean line breaks are natural, no text objects overlap, the PPT objects remain selectable, and both full-size and thumbnail reads work. Have an independent vision or design pass score content, image provenance, hierarchy, legibility, rhythm, editability, and parity with the supplied PPTX quality bar from 1–5; fix every score below 4 and record scores, changes, and remaining limits in `qa/report.md`. A structural check passing alone is not visual approval.
 11. Write platform variants from the same claim order and sources. Instagram gets the carousel caption with CTA and source notes; Threads gets a short lead plus reply-sized beats. Read [references/publishing.md](references/publishing.md) before any API or browser publishing. Publish only when the user explicitly asks and the required account authorization is already available.
 
 ## Conversation and handoff
@@ -79,6 +79,8 @@ Return one folder containing at least:
 `manifest.json` is the source of truth for slide order, dimensions, layout, headlines, alt text, platform copy, and source IDs. Keep previews and contact sheets outside the publish list unless the user asks for them. Keep topic-specific outputs in `outputs/<slug>/`; never add them to the reusable skill.
 
 ## Quality gates
+
+When a target PPTX is supplied, the output is ready only when it reaches the same production level: a strong thumbnail cover, clear title/body/emphasis hierarchy, alternating visual rhythm, one meaningful visual proof per relevant slide, generous whitespace, natural Korean line breaks, and an editable PPT whose text, images, overlays, and logo can be changed independently. Do not accept a lower-quality PNG simply because the package structure is complete.
 
 - Do not invent names, dates, prices, eligibility, performance, or quotations.
 - Keep source links close to the claim in `sources.json` and the final caption or source slide.
