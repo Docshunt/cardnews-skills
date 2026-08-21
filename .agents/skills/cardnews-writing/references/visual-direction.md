@@ -21,6 +21,21 @@ When the user says the result must match the supplied deck, use it as the accept
 
 The nine-slide reference demonstrates the expected rhythm: a full-bleed hook, alternating text-and-visual evidence cards, then one or two sparse centered closing cards. Do not force every story to nine slides; preserve the same pacing, information density, and finish. A card that is technically valid but cramped, visually flat, generic, or not independently editable is below the target.
 
+## Minimal editorial 4:5 template contract
+
+When the supplied reference deck is the quality benchmark, abstract only its reusable editorial grammar. Do not reproduce its topic, copy, brand assets, screenshots, or decorative treatment.
+
+- `cover`: one full-bleed image, a short lower-left hook, and one small replaceable mark.
+- `text-image`: headline and short explanation first, then one full-width evidence image.
+- `image-text`: one full-width evidence image first, then the headline and explanation.
+- `image-text-split`: one large image, followed by a narrow process list and one short takeaway.
+- `centered-synthesis`: a single strategic conclusion with generous whitespace.
+- `centered-close`: one memorable next principle and a small logo; remove anything that competes with the close.
+
+The default sequence is `cover → text-image → image-text → text-image → image-text-split → image-text → text-image → centered-synthesis → centered-close`. Shorter stories may omit frames, but must keep the alternation and the sparse ending. Preserve the reference's 1080×1350 canvas, near-white body background, near-black ink, bold Pretendard-like Korean type, large image bands, and 72px side margin. Edit existing text and image objects in place whenever a native template exists.
+
+To avoid an artificial “AI-made” look: use one visual proof per card, crop real source media large enough to read, keep Korean text out of generated raster backgrounds, and never fill empty space with generic dashboards, repeated UI cards, fake charts, stickers, or decorative icons. If the copy does not fit the inherited box, shorten the copy or change the frame before shrinking the type.
+
 ## 교생지 signal
 
 Use this signal for people-centered education, school-life, and interview stories:
