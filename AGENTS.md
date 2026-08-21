@@ -43,6 +43,7 @@ For a real card-news output, also run:
 
 ```bash
 node .agents/skills/cardnews-writing/scripts/validate-cardnews.mjs outputs/<slug>
+node .agents/skills/cardnews-writing/scripts/check-cardnews-quality.mjs outputs/<slug>
 ```
 
 ## Codex collaboration

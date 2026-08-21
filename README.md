@@ -18,11 +18,18 @@ python3 /Users/sungwon/.codex/skills/.system/skill-creator/scripts/quick_validat
 npm run pack:check
 ```
 
+For a rendered card-news package, run the structure check and the visual-quality harness:
+
+```bash
+node .agents/skills/cardnews-writing/scripts/validate-cardnews.mjs outputs/<slug>
+node .agents/skills/cardnews-writing/scripts/check-cardnews-quality.mjs outputs/<slug>
+```
+
 The canonical skill lives at `.agents/skills/cardnews-writing/`. npm packaging is configured through `npmSkills.publish.source` and includes only that skill plus this repository's operating files.
 
 ## Output
 
-The skill creates a source-backed package with a manifest, copy and image plans, an editable versioned 4:5 PPT, raster slides, preserved image originals and used files, platform-specific captions, alt text, source tracking, and QA records. Read the bundled [manifest contract](.agents/skills/cardnews-writing/references/manifest.md), [visual direction](.agents/skills/cardnews-writing/references/visual-direction.md), and [publishing notes](.agents/skills/cardnews-writing/references/publishing.md) when a task reaches QA or external publishing.
+The skill creates a source-backed package with a manifest, copy and image plans, an editable versioned 4:5 PPT, raster slides, preserved image originals and used files, platform-specific captions, alt text, source tracking, and QA records. Read the bundled [manifest contract](.agents/skills/cardnews-writing/references/manifest.md), [visual direction](.agents/skills/cardnews-writing/references/visual-direction.md), [quality harness](.agents/skills/cardnews-writing/references/quality-harness.md), and [publishing notes](.agents/skills/cardnews-writing/references/publishing.md) when a task reaches QA or external publishing.
 
 When a reference PPTX is supplied as the quality target, compare the rendered cards and editable object structure against it; passing the file check alone is not visual approval.
 

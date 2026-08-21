@@ -12,6 +12,16 @@ Create `manifest.json` in the card-news output folder before rendering. It is th
   "design": {
     "mode": "editorial-magazine",
     "visual_mode": "photo-led",
+    "template_sequence": ["cover", "text-image", "image-text", "centered-close"],
+    "quality_constraints": {
+      "one_visual_proof_per_slide": true,
+      "source_media_preferred": true,
+      "baked_copy_in_raster": false,
+      "generic_ui_cards": false,
+      "decorative_fill": false,
+      "flattened_slide_background": false,
+      "editable_source_required": true
+    },
     "mark": {
       "white": "assets/brand/docshunt-white.png",
       "black": "assets/brand/docshunt-black.png"
@@ -92,10 +102,10 @@ Create `manifest.json` in the card-news output folder before rendering. It is th
 Keep the derived package beside the manifest:
 
 - `text.json`: copy-only view with slide IDs, headlines, body lines, emphasis, and source lines;
-- `image-plan.json`: one entry per image with original file, used file, placement, alt text, rights status, and source URL;
+- `image-plan.json`: one entry per slide. Image-bearing entries must include `original_file`, `used_file`, `placement`, `alt`, `rights_status`, `source_url`, and `source_ids`; text-only synthesis or close cards may set `asset` to `null`;
 - `<slug>-editable-vN.pptx`: versioned editable source, never silently overwrite the previous version;
 - `images/originals/` and `images/used/`: preserve the downloaded or captured original separately from the crop or correction inserted into the PPT;
 - `sources.json`: the full source and rights trail;
-- `qa/contact-sheet.png` and `qa/report.md`: mobile-scale review and scores, fixes, and remaining limits.
+- `qa/contact-sheet.png`, `qa/visual-review.json`, and `qa/report.md`: mobile-scale review and 1–5 scores, fixes, and remaining limits. Every visual-review score must be at least 4 before handoff.
 
 Paths are relative to the manifest folder. Never use absolute paths or `..` segments.

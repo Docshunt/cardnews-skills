@@ -22,7 +22,8 @@
     "node": ">=22"
   },
   "scripts": {
-    "test": "node .agents/skills/cardnews-writing/scripts/validate-cardnews.mjs --self-test",
+    "test": "node .agents/skills/cardnews-writing/scripts/validate-cardnews.mjs --self-test && node .agents/skills/cardnews-writing/scripts/check-cardnews-quality.mjs --self-test",
+    "check:quality": "node .agents/skills/cardnews-writing/scripts/check-cardnews-quality.mjs",
     "pack:check": "npm pack --dry-run"
   },
   "npmSkills": {
