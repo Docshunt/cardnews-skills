@@ -22,6 +22,6 @@ The canonical skill lives at `.agents/skills/cardnews-writing/`. npm packaging i
 
 ## Output
 
-The skill creates a manifest, 4:5 raster slides by default, platform-specific captions, alt text, and source tracking. Read the bundled [manifest contract](.agents/skills/cardnews-writing/references/manifest.md) and [publishing notes](.agents/skills/cardnews-writing/references/publishing.md) when a task reaches QA or external publishing.
+The skill creates a source-backed package with a manifest, copy and image plans, an editable versioned 4:5 PPT, raster slides, preserved image originals and used files, platform-specific captions, alt text, source tracking, and QA records. Read the bundled [manifest contract](.agents/skills/cardnews-writing/references/manifest.md), [visual direction](.agents/skills/cardnews-writing/references/visual-direction.md), and [publishing notes](.agents/skills/cardnews-writing/references/publishing.md) when a task reaches QA or external publishing.
 
 Actual Meta publishing is intentionally opt-in and credential-gated; the skill does not send publish requests during generation or validation.

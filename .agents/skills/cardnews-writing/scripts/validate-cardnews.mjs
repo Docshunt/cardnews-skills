@@ -50,6 +50,75 @@ function nonEmpty(value) {
   return typeof value === "string" && value.trim().length > 0;
 }
 
+function requireFile(root, relativePath, errors) {
+  const filePath = path.resolve(root, relativePath);
+  if (!isInside(root, filePath) || !fs.existsSync(filePath)) {
+    errors.push(`Required package file is missing: ${relativePath}`);
+    return false;
+  }
+  if (!fs.statSync(filePath).isFile() || fs.statSync(filePath).size === 0) {
+    errors.push(`Required package file is empty: ${relativePath}`);
+    return false;
+  }
+  return true;
+}
+
+function requireDirectory(root, relativePath, errors) {
+  const directoryPath = path.resolve(root, relativePath);
+  if (!isInside(root, directoryPath) || !fs.existsSync(directoryPath) || !fs.statSync(directoryPath).isDirectory()) {
+    errors.push(`Required package directory is missing: ${relativePath}`);
+    return false;
+  }
+  const entries = fs.readdirSync(directoryPath).filter((entry) => !entry.startsWith("."));
+  if (entries.length === 0) errors.push(`Required package directory is empty: ${relativePath}`);
+  return true;
+}
+
+function readJsonFile(root, relativePath, errors) {
+  const filePath = path.resolve(root, relativePath);
+  if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile() || fs.statSync(filePath).size === 0) return null;
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  } catch (error) {
+    errors.push(`${relativePath} is not valid JSON: ${error.message}`);
+    return null;
+  }
+}
+
+function validatePackage(root, manifest, errors) {
+  [
+    "text.json",
+    "image-plan.json",
+    "captions/instagram.txt",
+    "captions/threads.md",
+    "sources.json",
+    "qa/contact-sheet.png",
+    "qa/report.md",
+  ].forEach((relativePath) => requireFile(root, relativePath, errors));
+  ["images/originals", "images/used"].forEach((relativePath) => requireDirectory(root, relativePath, errors));
+
+  const pptxPattern = new RegExp(`^${manifest.slug}-editable-v\\d+\\.pptx$`);
+  const editableFiles = fs.existsSync(root)
+    ? fs.readdirSync(root).filter((entry) => pptxPattern.test(entry))
+    : [];
+  if (editableFiles.length === 0) errors.push(`Editable PPTX is missing: ${manifest.slug}-editable-vN.pptx`);
+
+  const text = readJsonFile(root, "text.json", errors);
+  if (text && (!Array.isArray(text.slides) || text.slides.length !== manifest.slides.length)) {
+    errors.push("text.json.slides must match manifest.slides in length.");
+  }
+  const imagePlan = readJsonFile(root, "image-plan.json", errors);
+  if (imagePlan && !Array.isArray(imagePlan.slides)) errors.push("image-plan.json.slides must be an array.");
+  const sources = readJsonFile(root, "sources.json", errors);
+  if (sources && (!Array.isArray(sources) || sources.length === 0)) errors.push("sources.json must contain at least one source.");
+  if (Array.isArray(sources)) {
+    sources.forEach((source, index) => {
+      if (!nonEmpty(source?.id)) errors.push(`sources.json[${index}].id is required.`);
+      if (!nonEmpty(source?.url)) errors.push(`sources.json[${index}].url is required.`);
+    });
+  }
+}
+
 function validateManifest(outputDir, manifestName = "manifest.json") {
   const root = path.resolve(outputDir);
   const manifestPath = path.resolve(root, manifestName);
@@ -74,6 +143,9 @@ function validateManifest(outputDir, manifestName = "manifest.json") {
 
   if (!/^[-a-z0-9]+$/.test(manifest.slug ?? "")) errors.push("slug must be lowercase kebab-case.");
   if (!nonEmpty(manifest.title)) errors.push("title is required.");
+  if (!nonEmpty(manifest.editorial_claim)) errors.push("editorial_claim is required.");
+  if (!nonEmpty(manifest.design?.mode)) errors.push("design.mode is required.");
+  if (!nonEmpty(manifest.design?.visual_mode)) errors.push("design.visual_mode is required.");
 
   const canvas = manifest.canvas;
   const canvasKey = `${canvas?.width}x${canvas?.height}`;
@@ -90,12 +162,15 @@ function validateManifest(outputDir, manifestName = "manifest.json") {
         errors.push(`${label} must be an object.`);
         return;
       }
+      if (!nonEmpty(slide.id)) errors.push(`${label}.id is required.`);
       if (!nonEmpty(slide.file)) {
         errors.push(`${label}.file is required.`);
         return;
       }
+      if (!nonEmpty(slide.layout)) errors.push(`${label}.layout is required.`);
       if (!nonEmpty(slide.headline)) errors.push(`${label}.headline is required.`);
       if (!nonEmpty(slide.alt)) errors.push(`${label}.alt is required.`);
+      if (!Array.isArray(slide.source_ids)) errors.push(`${label}.source_ids must be an array.`);
       if (index === 0 && slide.role !== "cover") errors.push("slides[0].role must be cover.");
       if ([...String(slide.headline ?? "")].length > 34) warnings.push(`${label}.headline is long; check it at thumbnail size.`);
 
@@ -128,6 +203,14 @@ function validateManifest(outputDir, manifestName = "manifest.json") {
   if (!nonEmpty(manifest.platforms?.threads?.root)) errors.push("platforms.threads.root is required.");
   if (!Array.isArray(manifest.platforms?.threads?.replies)) warnings.push("platforms.threads.replies is missing; use [] for a text-only handoff.");
   if (!Array.isArray(manifest.sources) || manifest.sources.length === 0) errors.push("sources must contain at least one source.");
+  if (Array.isArray(manifest.sources)) {
+    manifest.sources.forEach((source, index) => {
+      if (!nonEmpty(source?.id)) errors.push(`sources[${index}].id is required.`);
+      if (!nonEmpty(source?.url)) errors.push(`sources[${index}].url is required.`);
+    });
+  }
+
+  if (manifest.slug && Array.isArray(manifest.slides)) validatePackage(root, manifest, errors);
 
   return { errors, warnings, manifest };
 }
@@ -143,22 +226,41 @@ function selfTest() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "cardnews-validator-"));
   try {
     fs.mkdirSync(path.join(root, "slides"));
+    fs.mkdirSync(path.join(root, "images", "originals"), { recursive: true });
+    fs.mkdirSync(path.join(root, "images", "used"), { recursive: true });
+    fs.mkdirSync(path.join(root, "captions"));
+    fs.mkdirSync(path.join(root, "qa"));
     for (let index = 1; index <= 4; index += 1) {
       fs.writeFileSync(path.join(root, "slides", `${String(index).padStart(2, "0")}.png`), makeTestPng(1080, 1350));
     }
+    fs.writeFileSync(path.join(root, "images", "originals", "p01-original.png"), makeTestPng(10, 10));
+    fs.writeFileSync(path.join(root, "images", "used", "p01-used.png"), makeTestPng(10, 10));
+    fs.writeFileSync(path.join(root, "captions", "instagram.txt"), "캡션");
+    fs.writeFileSync(path.join(root, "captions", "threads.md"), "첫 글");
+    fs.writeFileSync(path.join(root, "qa", "contact-sheet.png"), makeTestPng(1080, 1350));
+    fs.writeFileSync(path.join(root, "qa", "report.md"), "검수 완료");
+    fs.writeFileSync(path.join(root, "self-test-editable-v1.pptx"), Buffer.from("PK\\x03\\x04"));
     fs.writeFileSync(path.join(root, "manifest.json"), JSON.stringify({
       slug: "self-test",
       title: "자체 검증",
+      editorial_claim: "자체 검증이 통과한다",
       canvas: { width: 1080, height: 1350 },
+      design: { mode: "editorial-magazine", visual_mode: "text-led" },
       slides: [1, 2, 3, 4].map((index) => ({
+        id: `${String(index).padStart(2, "0")}-card`,
         file: `slides/${String(index).padStart(2, "0")}.png`,
         role: index === 1 ? "cover" : "body",
+        layout: index === 1 ? "cover" : "text-image",
         headline: `카드 ${index}`,
         alt: `카드 ${index} 설명`,
+        source_ids: ["src-01"],
       })),
       platforms: { instagram: { caption: "캡션" }, threads: { root: "첫 글", replies: [] } },
-      sources: [{ label: "self-test", url: "https://example.com" }],
+      sources: [{ id: "src-01", label: "self-test", url: "https://example.com", kind: "official", rights_status: "reference-only", accessed_at: "2026-08-21" }],
     }));
+    fs.writeFileSync(path.join(root, "text.json"), JSON.stringify({ slides: [1, 2, 3, 4] }));
+    fs.writeFileSync(path.join(root, "image-plan.json"), JSON.stringify({ slides: [{ slide_id: "01-card" }] }));
+    fs.writeFileSync(path.join(root, "sources.json"), JSON.stringify([{ id: "src-01", url: "https://example.com" }]));
     const result = validateManifest(root);
     if (result.errors.length > 0) throw new Error(result.errors.join("\n"));
     console.log("Card-news validator self-test passed.");
@@ -184,7 +286,7 @@ function main(argv) {
     process.exitCode = 1;
     return;
   }
-  console.log(`Card-news OK: ${result.manifest.slides.length} slides, ${result.manifest.canvas.width}x${result.manifest.canvas.height}.`);
+  console.log(`Card-news OK: ${result.manifest.slides.length} slides, ${result.manifest.canvas.width}x${result.manifest.canvas.height}, package complete.`);
   if (result.warnings.length > 0) console.warn(result.warnings.map((warning) => `WARN: ${warning}`).join("\n"));
 }
 

@@ -1,52 +1,51 @@
 ---
 name: cardnews-writing
-description: Create Korean editorial card-news carousels and cross-platform publishing packages for Instagram and Threads. Use when turning a topic, article, interview, announcement, product, or source material into magazine-style visual slides, captions, alt text, and publish-ready metadata.
+description: Create Korean editorial card-news carousels and cross-platform publishing packages from topics, articles, interviews, announcements, products, or source files. Produce source-backed copy, editable 4:5 PPT originals, 1080×1350 PNG slides, preserved image assets, captions, alt text, and QA records for Instagram and Threads.
 ---
 
 # Card News Writing
 
-Create an editorial card-news package that is ready for visual review and can be published to Instagram and Threads without rewriting the story twice.
+Create one source-backed package that keeps the story, evidence, images, editable original, previews, and publishing copy connected.
 
 ## Workflow
 
-1. Inspect the repository for existing brand assets, fonts, image helpers, output conventions, and source material. Reuse them before adding anything.
-2. Establish the audience, one-sentence promise, factual sources, CTA, and visual mode before designing slides.
-3. Write the slide plan before rendering. Use one idea per slide and keep the cover to one strong hook.
-4. Create `manifest.json` first. Follow [references/manifest.md](references/manifest.md) and keep every slide file listed there.
-5. Render raster slides at `1080×1350` by default. Use `1080×1440` only when the requested visual direction needs the taller 3:4 canvas. Keep text inside a 72px horizontal and 96px vertical safe area.
-6. Use real, licensed, or user-provided photography when a subject or event is central. Use `$imagegen` only for missing illustrative imagery; render all important text with SVG, HTML/CSS, or another deterministic compositor rather than asking an image model to spell it.
-7. Validate the package:
+1. Inspect the available brand assets, fonts, logo PNGs, existing templates, source files, and output conventions. Reuse them before designing anything. Treat a supplied deck as a visual quality reference unless the user explicitly asks to follow it as a template.
+2. Lock the brief in one line each before writing:
+   - reader: who needs this;
+   - editorial claim: the one sentence the carousel must prove;
+   - reader tension: why this matters now;
+   - evidence: the primary facts, numbers, and quotes;
+   - Docshunt angle: the startup, growth, AI, or business-plan lens;
+   - close: one thing to save or do;
+   - visual mode: photo-led, text-led, or quote-led;
+   - HSO: Hook → Story → Offer.
+3. Build a source table before polishing Korean copy. Prefer official newsrooms, product pages, original interviews, government or institutional records, statistics, and official videos; use trusted media only for cross-checking. Record the claim, direct URL, source text or metric, candidate image, rights status, and target slide. Search snippets, Google Images, and Pinterest are discovery layers only: trace every final image back to its original page and rights. If a fact, image, or permission is not confirmed, leave it marked unknown or use a placeholder; never fill the gap with an invented detail.
+4. Separate fact, interpretation, and claim. Fact is what the source directly says; interpretation is the editorial meaning; claim is the carousel's message. Do not write interpretation as fact. Lock dates, numbers, names, and quotations before editorial rewriting.
+5. Write the slide plan before rendering. Use one narrative job per slide and a cumulative flow such as `cover → context → story/evidence → complexity → interpretation → application → close`. HSO means a useful hook, a story that earns the conclusion, and a practical saved principle or next action—not a forced sales line. Keep the slide count flexible; remove repeated beats before adding cards.
+6. Create `manifest.json` first. Follow [references/manifest.md](references/manifest.md), link each slide to its layout and source IDs, then create the copy-only `text.json` and image replacement map `image-plan.json`.
+7. Source images in this order: user-provided originals, commissioned or self-shot work, official press or product assets, official video stills, licensed stock or public-domain material, then AI illustration. Use real originals for real people, companies, products, interfaces, events, statistics, and evidence. Use AI only for abstract concepts or non-factual atmosphere. Keep an unconfirmed image as a placeholder until its original and usage status are verified. Never bake final Korean copy into an AI image.
+8. Build an editable 4:5 PPT. Keep each headline, body, emphasis, source label, logo PNG, photo, and overlay as a separately selectable object; keep the image and dark gradient separate on a cover; never use a flattened card image as the slide background. Read [references/visual-direction.md](references/visual-direction.md) before choosing the visual treatment.
+9. Render every slide at `1080×1350` by default (`1080×1440` only when the taller 3:4 treatment is intentional). Keep text within a 72px horizontal and 96px vertical safe area. Preserve the original image and the cropped or corrected used image under `images/originals/` and `images/used/`, and record the source and rights status.
+10. Validate and review the complete package:
 
    ```bash
    node .agents/skills/cardnews-writing/scripts/validate-cardnews.mjs outputs/<slug>
    ```
 
-8. Inspect a contact sheet at mobile scale. For reference-led or production-quality work, complete at least two documented review loops:
-   - inspect both the full-size slides and a 320px-wide contact sheet;
-   - ask an independent vision or design reviewer to score hook clarity, Korean legibility, hierarchy, slide rhythm, reference fit without copying, and source trust from 1–5 without seeding expected defects;
-   - fix every category below 4, render again, and rerun the validator;
-   - record the scores, changes, and remaining limits in `qa/report.md`.
-9. Write platform variants. Instagram gets the carousel caption; Threads gets a short lead post plus reply-sized beats. Keep the claim order and sources aligned.
-10. Read [references/publishing.md](references/publishing.md) before any API or browser publishing. Publish only when the user explicitly asks for it and the required account authorization is already available.
+   Inspect every slide at full size and a 320px-wide contact sheet. Check that the cover hook is readable, each page has one job, facts and interpretation are distinguishable, images directly support the sentence, Korean line breaks are natural, no text objects overlap, the PPT objects remain selectable, and both full-size and thumbnail reads work. Have an independent vision or design pass score content, image provenance, hierarchy, legibility, rhythm, editability, and reference fit from 1–5; fix every score below 4 and record scores, changes, and remaining limits in `qa/report.md`.
+11. Write platform variants from the same claim order and sources. Instagram gets the carousel caption with CTA and source notes; Threads gets a short lead plus reply-sized beats. Read [references/publishing.md](references/publishing.md) before any API or browser publishing. Publish only when the user explicitly asks and the required account authorization is already available.
 
 ## Conversation and handoff
 
 - Speak to the user only in plain, everyday Korean. Never mention development terms or internal work such as repositories, branches, commits, pushes, packages, manifests, validators, scripts, commands, or runtimes.
 - Report only the useful outcome: what was made, how many cards are ready, whether the checks passed, where the result is saved, and any choice the user still needs to make.
-- Keep the topic-specific images, captions, sources, previews, and reports inside `outputs/<slug>/`. They are local deliverables and must never be tracked or shared with the reusable template.
-- When the user asks to see the result, resolve the absolute `outputs/<slug>` path, run `open <absolute-output-folder>` on macOS, and reply in Korean that the result folder was opened. Do not show the command.
-- When the result meets the requested quality and no change request remains, immediately save only reusable skill, template, root `README.md`, or operating-guide improvements to `main` and share them. Never include `outputs/`, even by force.
-- Keep the root `README.md` permanently as the project guide. Never rewrite, delete, or omit it unless the user explicitly asks, and never create another README inside this skill folder.
+- When the user asks to see the result, resolve the absolute `outputs/<slug>` folder, open that exact folder in macOS Finder, and say only that the result folder was opened.
+- When quality checks pass and no requested changes remain, save only reusable skill, template, root `README.md`, or operating-guide changes to `main`. Keep every topic-specific result under `outputs/`, which remains ignored and untracked. Never force-add anything from `outputs/`.
+- Keep the root `README.md` as the permanent project guide. Never create another README inside this skill.
 
 ## Editorial direction
 
-Use the references as a north star, not as a brand to copy. Default to a photo-led magazine cover, a high-contrast headline over a dark gradient, restrained accent color, and a small consistent brand mark. Prefer:
-
-- a concrete Korean hook over an abstract slogan;
-- a human, place, object, or document that gives the story a visual anchor;
-- short headlines, generous line spacing, and one visual hierarchy per slide;
-- a sequence of `hook → context → evidence → implication → action`;
-- a source or verification note when the card makes a current, numerical, political, legal, medical, or financial claim.
+Use references as a north star, never as copy, logos, watermarks, exact layouts, or imagery to reproduce. The quality target is a restrained magazine carousel: a decisive cover, short declarative headlines, generous white space, one useful visual proof, and a closing principle worth saving. Prefer a real person, place, object, document, or product screen over generic atmosphere.
 
 Choose the least decorative mode that makes the topic clear:
 
@@ -55,8 +54,6 @@ Choose the least decorative mode that makes the topic clear:
 - `how-to`: checklist, process, or practical tip;
 - `profile`: person, company, book, tool, or case study.
 
-Do not reproduce the reference accounts' logos, watermarks, exact layouts, captions, or imagery. Replace them with the user's brand system and give collaborators credit where required.
-
 ## Output contract
 
 Return one folder containing at least:
@@ -64,19 +61,29 @@ Return one folder containing at least:
 ```text
 <slug>/
 ├── manifest.json
+├── text.json
+├── image-plan.json
+├── <slug>-editable-vN.pptx
 ├── slides/01-cover.png …
+├── images/
+│   ├── originals/
+│   └── used/
 ├── captions/instagram.txt
 ├── captions/threads.md
-└── sources.json
+├── sources.json
+└── qa/
+    ├── contact-sheet.png
+    └── report.md
 ```
 
-The `manifest.json` is the source of truth for slide order, dimensions, headlines, alt text, platform captions, and sources. Keep generated previews or contact sheets outside the publish list unless the user asks for them.
+`manifest.json` is the source of truth for slide order, dimensions, layout, headlines, alt text, platform copy, and source IDs. Keep previews and contact sheets outside the publish list unless the user asks for them. Keep topic-specific outputs in `outputs/<slug>/`; never add them to the reusable skill.
 
 ## Quality gates
 
 - Do not invent names, dates, prices, eligibility, performance, or quotations.
 - Keep source links close to the claim in `sources.json` and the final caption or source slide.
 - Make every slide understandable without the caption; make every slide describable in `alt` text.
-- Keep the first slide useful as a thumbnail and the final slide useful as a saved reference.
+- Keep the first slide useful as a thumbnail and the final slide useful as a saved reference or clear next action.
 - Do not hide trust signals in unreadable footnotes. Keep slide source labels at least 28px on a 1080px canvas, or move the full citation to the caption and `sources.json`.
+- Use one accent color at most unless the brand already has a palette. Avoid decorative stickers, meaningless icons, page numbers, generic stock atmosphere, and charts that do not change the reader's understanding.
 - Do not publish secrets, access tokens, private source URLs, or unapproved sponsored copy.
