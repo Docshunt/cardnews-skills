@@ -31,6 +31,6 @@ The canonical skill lives at `.agents/skills/cardnews-writing/`. npm packaging i
 
 The skill creates a source-backed package with a manifest, copy and image plans, an editable versioned 4:5 PPT, raster slides, preserved image originals and used files, platform-specific captions, alt text, source tracking, and QA records. Read the bundled [manifest contract](.agents/skills/cardnews-writing/references/manifest.md), [visual direction](.agents/skills/cardnews-writing/references/visual-direction.md), [quality harness](.agents/skills/cardnews-writing/references/quality-harness.md), and [publishing notes](.agents/skills/cardnews-writing/references/publishing.md) when a task reaches QA or external publishing.
 
-When a reference PPTX is supplied as the quality target, compare the rendered cards and editable object structure against it; passing the file check alone is not visual approval.
+When a reference PPTX is supplied as the quality target, keep the first render, record concrete design findings, apply at least one material correction, and rerender the complete deck before final approval. Passing the file check or writing a one-pass score sheet is not visual approval.
 
 Actual Meta publishing is intentionally opt-in and credential-gated; the skill does not send publish requests during generation or validation.

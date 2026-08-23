@@ -89,7 +89,7 @@ function isSubsequence(actual, expected) {
   return true;
 }
 
-function checkQuality({ root, manifest, imagePlan, sources, visualReview, inspectText, verifyFiles = true }) {
+function checkQuality({ root, manifest, imagePlan, sources, designIterations, visualReview, inspectText, verifyFiles = true }) {
   const errors = [];
   const warnings = [];
   const slides = Array.isArray(manifest?.slides) ? manifest.slides : [];
@@ -232,6 +232,55 @@ function checkQuality({ root, manifest, imagePlan, sources, visualReview, inspec
     if (visualReview.overall?.status !== "pass") errors.push("visual-review overall status must be pass.");
   }
 
+  if (!designIterations || typeof designIterations !== "object" || Array.isArray(designIterations)) {
+    errors.push("qa/design-iterations.json is required.");
+  } else {
+    const passes = Array.isArray(designIterations.passes) ? designIterations.passes : [];
+    const changes = Array.isArray(designIterations.changes) ? designIterations.changes : [];
+    const expectedSlideIds = [...slideIds].filter(Boolean).sort();
+    const passIds = new Set();
+
+    if (passes.length < 2) errors.push("design-iterations must retain at least a draft and a corrected final pass.");
+    for (const [index, pass] of passes.entries()) {
+      const label = `design-iterations.passes[${index}]`;
+      if (!pass?.id || passIds.has(pass.id)) errors.push(`${label}.id is missing or duplicated.`);
+      passIds.add(pass?.id);
+      const reviewedSlideIds = (Array.isArray(pass?.reviewed_slide_ids) ? [...pass.reviewed_slide_ids] : []).sort();
+      if (JSON.stringify(reviewedSlideIds) !== JSON.stringify(expectedSlideIds)) {
+        errors.push(`${label}.reviewed_slide_ids must contain every manifest slide exactly once.`);
+      }
+      if (!Array.isArray(pass?.findings)) errors.push(`${label}.findings must be an array.`);
+      for (const [findingIndex, finding] of (pass?.findings ?? []).entries()) {
+        if (!slideIds.has(finding?.slide_id) || !finding?.issue || !finding?.recommended_change) {
+          errors.push(`${label}.findings[${findingIndex}] needs a valid slide_id, issue, and recommended_change.`);
+        }
+      }
+      if (verifyFiles) safeRelativeFile(root, pass?.contact_sheet, `${label}.contact_sheet`, errors);
+    }
+
+    const draft = passes[0];
+    const finalPass = passes.at(-1);
+    if (draft?.status !== "revise") errors.push("The first design iteration must be marked revise.");
+    if (!Array.isArray(draft?.findings) || draft.findings.length === 0) errors.push("The draft design iteration must record at least one concrete finding.");
+    if (finalPass?.status !== "pass") errors.push("The final design iteration must be marked pass.");
+    if (!finalPass?.id || designIterations.final_pass !== finalPass.id) errors.push("design-iterations.final_pass must point to the last passing render.");
+    if (changes.length === 0) errors.push("design-iterations must record at least one material design change.");
+
+    const draftFindingSlides = new Set((draft?.findings ?? []).map((finding) => finding?.slide_id));
+    for (const [index, change] of changes.entries()) {
+      if (!slideIds.has(change?.slide_id) || !change?.from_pass || !change?.to_pass || !change?.change || !change?.reason) {
+        errors.push(`design-iterations.changes[${index}] needs a valid slide_id, from_pass, to_pass, change, and reason.`);
+        continue;
+      }
+      if (!passIds.has(change.from_pass) || !passIds.has(change.to_pass)) {
+        errors.push(`design-iterations.changes[${index}] references an unknown pass.`);
+      }
+      if (!draftFindingSlides.has(change.slide_id)) {
+        errors.push(`design-iterations.changes[${index}] must resolve a recorded draft finding.`);
+      }
+    }
+  }
+
   if (!inspectText) {
     errors.push("An editable PPTX inspect record is required.");
   } else {
@@ -249,7 +298,7 @@ function checkQuality({ root, manifest, imagePlan, sources, visualReview, inspec
   }
 
   if (verifyFiles) {
-    for (const required of ["qa/contact-sheet.png", "qa/report.md", "sources.json", "text.json", "image-plan.json"]) {
+    for (const required of ["qa/contact-sheet.png", "qa/design-iterations.json", "qa/report.md", "sources.json", "text.json", "image-plan.json"]) {
       safeRelativeFile(root, required, required, errors);
     }
   }
@@ -260,9 +309,13 @@ function selfTest() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "cardnews-quality-"));
   try {
     fs.mkdirSync(path.join(root, "slides"));
-    fs.mkdirSync(path.join(root, "qa"));
+    fs.mkdirSync(path.join(root, "qa", "iterations", "01-draft"), { recursive: true });
+    fs.mkdirSync(path.join(root, "qa", "iterations", "02-final"), { recursive: true });
     for (let index = 1; index <= 4; index += 1) fs.writeFileSync(path.join(root, "slides", `${index}.png`), "png");
     fs.writeFileSync(path.join(root, "qa", "contact-sheet.png"), "png");
+    fs.writeFileSync(path.join(root, "qa", "iterations", "01-draft", "contact-sheet.png"), "png");
+    fs.writeFileSync(path.join(root, "qa", "iterations", "02-final", "contact-sheet.png"), "png");
+    fs.writeFileSync(path.join(root, "qa", "design-iterations.json"), "{}");
     fs.writeFileSync(path.join(root, "qa", "report.md"), "report");
     fs.writeFileSync(path.join(root, "sources.json"), "[]");
     fs.writeFileSync(path.join(root, "text.json"), "{}");
@@ -281,6 +334,26 @@ function selfTest() {
       slides: slides.map((slide) => ({ slide_id: slide.id, status: "pass", note: "ok", scores: Object.fromEntries(QUALITY_SCORES.map((key) => [key, 4])) })),
       overall: { status: "pass" },
     };
+    const designIterations = {
+      passes: [
+        {
+          id: "01-draft",
+          status: "revise",
+          contact_sheet: "qa/iterations/01-draft/contact-sheet.png",
+          reviewed_slide_ids: slides.map((slide) => slide.id),
+          findings: [{ slide_id: "02-context", issue: "Evidence crop is too loose.", recommended_change: "Tighten the crop around the subject." }],
+        },
+        {
+          id: "02-final",
+          status: "pass",
+          contact_sheet: "qa/iterations/02-final/contact-sheet.png",
+          reviewed_slide_ids: slides.map((slide) => slide.id),
+          findings: [],
+        },
+      ],
+      changes: [{ slide_id: "02-context", from_pass: "01-draft", to_pass: "02-final", change: "Tightened the evidence crop.", reason: "The subject now reads at thumbnail size." }],
+      final_pass: "02-final",
+    };
     const result = checkQuality({
       root,
       manifest: {
@@ -297,6 +370,7 @@ function selfTest() {
       },
       imagePlan: { slides: slides.map((slide) => ({ slide_id: slide.id, asset: null, alt: slide.alt, source_ids: slide.source_ids })) },
       sources: [source],
+      designIterations,
       visualReview,
       inspectText: slides.flatMap((slide) => [
         JSON.stringify({ kind: "slide", id: `sl/${slide.id}` }),
@@ -305,6 +379,30 @@ function selfTest() {
       ]).join("\n") + "\n" + JSON.stringify({ kind: "image", id: "im/01" }),
     });
     if (result.errors.length > 0) throw new Error(result.errors.join("\n"));
+    const missingChange = checkQuality({
+      root,
+      manifest: {
+        canvas: { width: 1080, height: 1350 },
+        design: { mode: "editorial-magazine", visual_mode: "text-led", quality_constraints: {
+          one_visual_proof_per_slide: true,
+          source_media_preferred: true,
+          baked_copy_in_raster: false,
+          generic_ui_cards: false,
+          decorative_fill: false,
+          flattened_slide_background: false,
+        } },
+        slides,
+      },
+      imagePlan: { slides: slides.map((slide) => ({ slide_id: slide.id, asset: null, alt: slide.alt, source_ids: slide.source_ids })) },
+      sources: [source],
+      designIterations: { ...designIterations, changes: [] },
+      visualReview,
+      inspectText: "",
+      verifyFiles: false,
+    });
+    if (!missingChange.errors.some((error) => error.includes("at least one material design change"))) {
+      throw new Error("Quality harness did not reject a design review with no material correction.");
+    }
     console.log("Card-news quality harness self-test passed.");
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
@@ -334,10 +432,11 @@ function main(argv) {
   const manifest = readJson(path.join(root, "manifest.json"), errors, "manifest.json");
   const imagePlan = readJson(path.join(root, "image-plan.json"), errors, "image-plan.json");
   const sources = readJson(path.join(root, "sources.json"), errors, "sources.json");
+  const designIterations = readJson(path.join(root, "qa", "design-iterations.json"), errors, "qa/design-iterations.json");
   const visualReview = readJson(path.join(root, "qa", "visual-review.json"), errors, "qa/visual-review.json");
   const inspectFile = fs.existsSync(root) ? fs.readdirSync(root).find((file) => /^.+-editable-v\d+\.pptx\.inspect\.ndjson$/.test(file)) : null;
   const inspectText = inspectFile ? fs.readFileSync(path.join(root, inspectFile), "utf8") : "";
-  const quality = checkQuality({ root, manifest, imagePlan, sources, visualReview, inspectText });
+  const quality = checkQuality({ root, manifest, imagePlan, sources, designIterations, visualReview, inspectText });
   errors.push(...quality.errors);
   const warnings = [...quality.warnings];
   if (errors.length > 0) {

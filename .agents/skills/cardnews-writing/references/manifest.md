@@ -106,6 +106,6 @@ Keep the derived package beside the manifest:
 - `<slug>-editable-vN.pptx`: versioned editable source, never silently overwrite the previous version;
 - `images/originals/` and `images/used/`: preserve the downloaded or captured original separately from the crop or correction inserted into the PPT;
 - `sources.json`: the full source and rights trail;
-- `qa/contact-sheet.png`, `qa/visual-review.json`, and `qa/report.md`: mobile-scale review and 1–5 scores, fixes, and remaining limits. Every visual-review score must be at least 4 before handoff.
+- `qa/design-iterations.json`, `qa/iterations/`, `qa/contact-sheet.png`, `qa/visual-review.json`, and `qa/report.md`: retained draft/final renders, concrete design findings and changes, mobile-scale review, 1–5 scores, fixes, and remaining limits. Require at least one material correction and a final score of 4 or 5 in every category before handoff.
 
 Paths are relative to the manifest folder. Never use absolute paths or `..` segments.

@@ -33,7 +33,7 @@ Create one source-backed package that keeps the story, evidence, images, editabl
    node .agents/skills/cardnews-writing/scripts/check-cardnews-quality.mjs outputs/<slug>
    ```
 
-   Inspect every slide at full size and a 320px-wide contact sheet. Check that the cover hook is readable, each page has one job, facts and interpretation are distinguishable, images directly support the sentence, Korean line breaks are natural, no text objects overlap, the PPT objects remain selectable, and both full-size and thumbnail reads work. Follow [references/quality-harness.md](references/quality-harness.md). Record the independent vision or design pass in `qa/visual-review.json`; score content hierarchy, legibility, rhythm, image evidence, anti-slop, editability, and parity with the supplied PPTX quality bar from 1–5. Fix every score below 4 and record scores, changes, and remaining limits in `qa/report.md`. A structural check passing alone is not visual approval.
+   Treat the first render as a draft, never as the delivery render. Save its slides and contact sheet under `qa/iterations/01-draft/`, inspect every slide at full size and 320px width, and record concrete hierarchy, crop, spacing, contrast, line-break, rhythm, and evidence problems in `qa/design-iterations.json`. Apply at least one material design correction supported by that review, rerender the complete deck under the next numbered iteration, and repeat until the final pass has no unresolved issue and every visual score is at least 4. Copy only the final pass into `slides/` and `qa/contact-sheet.png`. Follow [references/quality-harness.md](references/quality-harness.md). Record the final independent vision or design pass in `qa/visual-review.json`; score content hierarchy, legibility, rhythm, image evidence, anti-slop, editability, and parity with the supplied PPTX quality bar from 1–5. Record the before/after change and any remaining source-asset limit in `qa/report.md`. A structural check or a one-pass score sheet is not visual approval.
 11. Write platform variants from the same claim order and sources. Instagram gets the carousel caption with CTA and source notes; Threads gets a short lead plus reply-sized beats. Read [references/publishing.md](references/publishing.md) before any API or browser publishing. Publish only when the user explicitly asks and the required account authorization is already available.
 
 ## Conversation and handoff
@@ -74,6 +74,10 @@ Return one folder containing at least:
 ├── sources.json
 └── qa/
     ├── contact-sheet.png
+    ├── design-iterations.json
+    ├── iterations/
+    │   ├── 01-draft/contact-sheet.png
+    │   └── 02-final/contact-sheet.png
     ├── visual-review.json
     └── report.md
 ```
@@ -91,4 +95,5 @@ When a target PPTX is supplied, the output is ready only when it reaches the sam
 - Do not hide trust signals in unreadable footnotes. Keep slide source labels at least 28px on a 1080px canvas, or move the full citation to the caption and `sources.json`.
 - Use one accent color at most unless the brand already has a palette. Avoid decorative stickers, meaningless icons, page numbers, generic stock atmosphere, and charts that do not change the reader's understanding.
 - For reference-led work, declare `design.template_sequence` and `design.quality_constraints` in the manifest. Keep `image-plan.json` connected to each original file, used file, placement, rights status, and source URL so the same visual standard can be regenerated rather than improvised.
+- Keep at least two complete visual passes: a reviewed draft marked `revise` and a corrected final pass marked `pass`. `qa/design-iterations.json` must name every reviewed slide, the draft findings, and at least one material change carried into the final render.
 - Do not publish secrets, access tokens, private source URLs, or unapproved sponsored copy.
