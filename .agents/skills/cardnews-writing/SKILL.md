@@ -24,7 +24,7 @@ Create one source-backed package that keeps the story, evidence, images, editabl
 5. Write the slide plan before rendering. Use one narrative job per slide and a cumulative flow such as `cover → context → story/evidence → complexity → interpretation → application → close`. HSO means a useful hook, a story that earns the conclusion, and a practical saved principle or next action—not a forced sales line. Keep the slide count flexible; remove repeated beats before adding cards.
 6. Create `manifest.json` first. Follow [references/manifest.md](references/manifest.md), link each slide to its layout and source IDs, then create the copy-only `text.json` and image replacement map `image-plan.json`.
 7. Source images in this order: user-provided originals, commissioned or self-shot work, official press or product assets, official video stills, licensed stock or public-domain material, then AI illustration. Use real originals for real people, companies, products, interfaces, events, statistics, and evidence. Use AI only for abstract concepts or non-factual atmosphere. Keep an unconfirmed image as a placeholder until its original and usage status are verified. Never bake final Korean copy into an AI image.
-8. Build the editable 4:5 PPT as the primary authoring result, then export the PNGs from that same file. For PPTX authoring, follow the installed presentation workflow: use the bundled workspace dependencies and `@oai/artifact-tool` from JavaScript, render every slide, inspect each one, and fix overlap, clipping, wrapping, and empty placeholders before delivery. Keep each headline, body, emphasis, source label, logo PNG, photo, and overlay as a separately selectable object; keep the image and dark gradient separate on a cover; never use a flattened card image as the slide background. Read [references/visual-direction.md](references/visual-direction.md) before choosing the visual treatment.
+8. Use an editable 4:5 PPT as the authoring source, then export the user-facing result as full-resolution PNGs from that same file. Unless the user explicitly asks for a deck, present and open the final PNG folder first; keep the PPT only as the editable source behind those images. For PPTX authoring, follow the installed presentation workflow: use the bundled workspace dependencies and `@oai/artifact-tool` from JavaScript, render every slide, inspect each one, and fix overlap, clipping, wrapping, and empty placeholders before delivery. Keep each headline, body, emphasis, source label, logo PNG, photo, and overlay as a separately selectable object; keep the image and dark gradient separate on a cover; never use a flattened card image as the slide background. Read [references/visual-direction.md](references/visual-direction.md) before choosing the visual treatment.
 9. Render every slide at `1080×1350` by default (`1080×1440` only when the taller 3:4 treatment is intentional). Keep text within a 72px horizontal and 96px vertical safe area. Preserve the original image and the cropped or corrected used image under `images/originals/` and `images/used/`, and record the source and rights status.
 10. Validate and review the complete package:
 
@@ -39,8 +39,8 @@ Create one source-backed package that keeps the story, evidence, images, editabl
 ## Conversation and handoff
 
 - Speak to the user only in plain, everyday Korean. Never mention development terms or internal work such as repositories, branches, commits, pushes, packages, manifests, validators, scripts, commands, or runtimes.
-- Report only the useful outcome: what was made, how many cards are ready, whether the checks passed, where the result is saved, and any choice the user still needs to make.
-- When the user asks to see the result, resolve the absolute `outputs/<slug>` folder, open that exact folder in macOS Finder, and say only that the result folder was opened.
+- Report only the useful outcome: how many final PNG cards are ready, whether the checks passed, where the image folder is saved, and any choice the user still needs to make. Mention the editable PPT only when it helps or the user asks for it.
+- When the user asks to see the result, open the absolute `outputs/<slug>/final-images` folder when it exists; otherwise open `outputs/<slug>/slides`. Then say only that the result image folder was opened.
 - When quality checks pass and no requested changes remain, save only reusable skill, template, root `README.md`, or operating-guide changes to `main`. Keep every topic-specific result under `outputs/`, which remains ignored and untracked. Never force-add anything from `outputs/`.
 - Keep the root `README.md` as the permanent project guide. Never create another README inside this skill.
 
@@ -66,6 +66,7 @@ Return one folder containing at least:
 ├── image-plan.json
 ├── <slug>-editable-vN.pptx
 ├── slides/01-cover.png …
+├── final-images/01-cover.png …
 ├── images/
 │   ├── originals/
 │   └── used/
