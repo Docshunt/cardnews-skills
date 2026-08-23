@@ -162,7 +162,10 @@ function checkQuality({ root, manifest, imagePlan, sources, designIterations, vi
     if (PLACEHOLDER_PATTERNS.some((pattern) => pattern.test(combinedCopy))) {
       errors.push(`${label} contains placeholder copy.`);
     }
-    if (verifyFiles) safeRelativeFile(root, slide.file, `${label}.file`, errors);
+    if (verifyFiles) {
+      safeRelativeFile(root, slide.file, `${label}.file`, errors);
+      safeRelativeFile(root, path.join("final-images", path.basename(slide.file)), `${label}.final_image`, errors);
+    }
   }
 
   if (!Array.isArray(imagePlan?.slides) || imagePlan.slides.length !== slides.length) {
@@ -309,9 +312,13 @@ function selfTest() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "cardnews-quality-"));
   try {
     fs.mkdirSync(path.join(root, "slides"));
+    fs.mkdirSync(path.join(root, "final-images"));
     fs.mkdirSync(path.join(root, "qa", "iterations", "01-draft"), { recursive: true });
     fs.mkdirSync(path.join(root, "qa", "iterations", "02-final"), { recursive: true });
-    for (let index = 1; index <= 4; index += 1) fs.writeFileSync(path.join(root, "slides", `${index}.png`), "png");
+    for (let index = 1; index <= 4; index += 1) {
+      fs.writeFileSync(path.join(root, "slides", `${index}.png`), "png");
+      fs.writeFileSync(path.join(root, "final-images", `${index}.png`), "png");
+    }
     fs.writeFileSync(path.join(root, "qa", "contact-sheet.png"), "png");
     fs.writeFileSync(path.join(root, "qa", "iterations", "01-draft", "contact-sheet.png"), "png");
     fs.writeFileSync(path.join(root, "qa", "iterations", "02-final", "contact-sheet.png"), "png");
