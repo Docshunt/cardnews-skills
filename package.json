@@ -24,7 +24,8 @@
     "node": ">=22"
   },
   "scripts": {
-    "test": "node .agents/skills/cardnews-writing/scripts/validate-cardnews.mjs --self-test && npm run test:cardnews-skill && npm run test:cardnews-system",
+    "test": "node .agents/skills/cardnews-writing/scripts/validate-cardnews.mjs --self-test && node .agents/skills/cardnews-writing/scripts/check-cardnews-quality.mjs --self-test && npm run test:cardnews-skill && npm run test:cardnews-system",
+    "check:quality": "node .agents/skills/cardnews-writing/scripts/check-cardnews-quality.mjs",
     "test:cardnews-skill": "node scripts/validate-cardnews-skill.mjs",
     "test:cardnews-system": "node scripts/test-cardnews-system.mjs",
     "test:cardnews-build": "node scripts/test-cardnews-batch-build.mjs",

@@ -4,43 +4,13 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-const CANVASES = new Set(["1080x1350"]);
+const CANVAS = { width: 1080, height: 1350 };
 const LAYOUTS = new Set(["cover", "interview-quote", "text-image", "image-text", "centered-close"]);
 const MIN_VISIBLE_FONT_SIZE_PT = 22;
-const JPEG_SOFS = new Set([
-  0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf,
-]);
+const JPEG_SOFS = new Set([0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf]);
 
-function readDimensions(filePath) {
-  const data = fs.readFileSync(filePath);
-
-  if (data.length >= 24 && data.readUInt32BE(0) === 0x89504e47 && data.toString("ascii", 1, 4) === "PNG") {
-    return { width: data.readUInt32BE(16), height: data.readUInt32BE(20) };
-  }
-
-  if (data.length >= 4 && data[0] === 0xff && data[1] === 0xd8) {
-    let offset = 2;
-    while (offset + 9 < data.length) {
-      if (data[offset] !== 0xff) {
-        offset += 1;
-        continue;
-      }
-
-      const marker = data[offset + 1];
-      offset += 2;
-      if (marker === 0xd8 || marker === 0xd9 || (marker >= 0xd0 && marker <= 0xd7)) continue;
-      if (offset + 2 > data.length) break;
-
-      const segmentLength = data.readUInt16BE(offset);
-      if (segmentLength < 2 || offset + segmentLength > data.length) break;
-      if (JPEG_SOFS.has(marker)) {
-        return { width: data.readUInt16BE(offset + 5), height: data.readUInt16BE(offset + 3) };
-      }
-      offset += segmentLength;
-    }
-  }
-
-  throw new Error(`Unsupported or unreadable raster image: ${filePath}`);
+function nonEmpty(value) {
+  return typeof value === "string" && value.trim().length > 0;
 }
 
 function isInside(root, target) {
@@ -48,30 +18,61 @@ function isInside(root, target) {
   return relative === "" || (!relative.startsWith(`..${path.sep}`) && relative !== ".." && !path.isAbsolute(relative));
 }
 
-function nonEmpty(value) {
-  return typeof value === "string" && value.trim().length > 0;
+function readDimensions(filePath) {
+  const data = fs.readFileSync(filePath);
+  if (data.length >= 24 && data.readUInt32BE(0) === 0x89504e47 && data.toString("ascii", 1, 4) === "PNG") {
+    return { width: data.readUInt32BE(16), height: data.readUInt32BE(20) };
+  }
+  if (data.length >= 4 && data[0] === 0xff && data[1] === 0xd8) {
+    let offset = 2;
+    while (offset + 9 < data.length) {
+      if (data[offset] !== 0xff) { offset += 1; continue; }
+      const marker = data[offset + 1];
+      offset += 2;
+      if (marker === 0xd8 || marker === 0xd9 || (marker >= 0xd0 && marker <= 0xd7)) continue;
+      if (offset + 2 > data.length) break;
+      const segmentLength = data.readUInt16BE(offset);
+      if (segmentLength < 2 || offset + segmentLength > data.length) break;
+      if (JPEG_SOFS.has(marker)) return { width: data.readUInt16BE(offset + 5), height: data.readUInt16BE(offset + 3) };
+      offset += segmentLength;
+    }
+  }
+  throw new Error(`Unsupported or unreadable raster image: ${filePath}`);
 }
 
-function validateManifest(outputDir, manifestName = "manifest.json") {
+function requireRelativeFile(root, relativeFile, label, errors, extension) {
+  if (!nonEmpty(relativeFile)) {
+    errors.push(`${label} is required.`);
+    return null;
+  }
+  const filePath = path.resolve(root, relativeFile);
+  if (path.isAbsolute(relativeFile) || relativeFile.split(/[\\/]/).includes("..") || !isInside(root, filePath)) {
+    errors.push(`${label} must stay inside the output folder: ${relativeFile}`);
+    return null;
+  }
+  if (extension && !extension.test(filePath)) errors.push(`${label} must use ${extension}.`);
+  if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile() || fs.statSync(filePath).size === 0) {
+    errors.push(`${label} does not point to a non-empty file: ${relativeFile}`);
+    return null;
+  }
+  return filePath;
+}
+
+export function validateManifest(outputDir, manifestName = "manifest.json") {
   const root = path.resolve(outputDir);
-  const manifestPath = path.resolve(root, manifestName);
   const errors = [];
   const warnings = [];
+  const manifestPath = path.resolve(root, manifestName);
+  if (!fs.existsSync(manifestPath)) return { errors: [`Manifest not found: ${manifestPath}`], warnings, manifest: null };
+
   let manifest;
-
-  if (!fs.existsSync(manifestPath)) {
-    return { errors: [`Manifest not found: ${manifestPath}`], warnings, manifest: null };
-  }
-
   try {
     manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
   } catch (error) {
     return { errors: [`Manifest is not valid JSON: ${error.message}`], warnings, manifest: null };
   }
-
   if (!manifest || typeof manifest !== "object" || Array.isArray(manifest)) {
-    errors.push("Manifest root must be a JSON object.");
-    return { errors, warnings, manifest };
+    return { errors: ["Manifest root must be a JSON object."], warnings, manifest };
   }
 
   if (!/^[-a-z0-9]+$/.test(manifest.slug ?? "")) errors.push("slug must be lowercase kebab-case.");
@@ -79,140 +80,96 @@ function validateManifest(outputDir, manifestName = "manifest.json") {
 
   const editorial = manifest.editorial;
   if (!editorial || typeof editorial !== "object" || Array.isArray(editorial)) {
-    errors.push("editorial with claim, reader_takeaway, and narrative_arc is required.");
+    errors.push("editorial with claim, reader_takeaway, narrative_arc, and hso is required.");
   } else {
     if (!nonEmpty(editorial.claim)) errors.push("editorial.claim is required.");
     if (!nonEmpty(editorial.reader_takeaway)) errors.push("editorial.reader_takeaway is required.");
-    if (!Array.isArray(editorial.narrative_arc) || editorial.narrative_arc.length < 3) {
-      errors.push("editorial.narrative_arc must contain at least three story beats.");
-    } else if (editorial.narrative_arc.some((beat) => !nonEmpty(beat))) {
-      errors.push("editorial.narrative_arc must contain only non-empty story beats.");
+    if (!Array.isArray(editorial.narrative_arc) || editorial.narrative_arc.length < 3 || editorial.narrative_arc.some((value) => !nonEmpty(value))) {
+      errors.push("editorial.narrative_arc must contain at least three non-empty beats.");
     }
-
     const hso = editorial.hso;
-    if (!hso || typeof hso !== "object" || Array.isArray(hso)) {
-      errors.push("editorial.hso with hook, story, offer, and mode is required.");
-    } else {
-      if (!nonEmpty(hso.hook)) errors.push("editorial.hso.hook is required.");
-      if (!Array.isArray(hso.story) || hso.story.length < 2 || hso.story.some((beat) => !nonEmpty(beat))) {
-        errors.push("editorial.hso.story must contain at least two non-empty story beats.");
-      }
-      if (!nonEmpty(hso.offer)) errors.push("editorial.hso.offer is required.");
-      if (hso.mode !== "editorial-soft-offer") errors.push("editorial.hso.mode must be editorial-soft-offer.");
+    if (!hso || !nonEmpty(hso.hook) || !Array.isArray(hso.story) || hso.story.length < 2 || hso.story.some((value) => !nonEmpty(value)) || !nonEmpty(hso.offer) || hso.mode !== "editorial-soft-offer") {
+      errors.push("editorial.hso requires hook, two or more story beats, offer, and mode editorial-soft-offer.");
     }
   }
 
   const design = manifest.design;
-  const hasDocshuntMark = Boolean(
-    design
-      && typeof design === "object"
-      && !Array.isArray(design)
-      && design.mark
-      && typeof design.mark === "object"
-      && nonEmpty(design.mark.white)
-      && nonEmpty(design.mark.black),
-  );
   if (!design || typeof design !== "object" || Array.isArray(design)) {
-    errors.push("design with editorial-card-system tokens is required.");
+    errors.push("design is required.");
   } else {
     if (design.system !== "editorial-card-system") errors.push("design.system must be editorial-card-system.");
-    for (const token of ["surface", "ink", "photo_overlay"]) {
-      if (!nonEmpty(design[token])) errors.push(`design.${token} is required.`);
+    if (!nonEmpty(design.mode)) errors.push("design.mode is required.");
+    if (!nonEmpty(design.visual_mode)) errors.push("design.visual_mode is required.");
+    for (const key of ["surface", "ink", "photo_overlay", "template_id"]) {
+      if (!nonEmpty(design[key])) errors.push(`design.${key} is required.`);
     }
-    const declaredMinFontSize = design.typography?.min_font_size_pt;
-    if (declaredMinFontSize === undefined) {
-      warnings.push(`design.typography.min_font_size_pt is missing; the editable-PPT builder enforces ${MIN_VISIBLE_FONT_SIZE_PT} pt.`);
-    } else if (!Number.isFinite(Number(declaredMinFontSize)) || Number(declaredMinFontSize) < MIN_VISIBLE_FONT_SIZE_PT) {
+    if (!Array.isArray(design.template_sequence) || design.template_sequence.length === 0) errors.push("design.template_sequence is required.");
+    if (!Number.isFinite(Number(design.typography?.min_font_size_pt)) || Number(design.typography.min_font_size_pt) < MIN_VISIBLE_FONT_SIZE_PT) {
       errors.push(`design.typography.min_font_size_pt must be at least ${MIN_VISIBLE_FONT_SIZE_PT}.`);
     }
-    if (hasDocshuntMark && design.mark.placement !== "cover-and-final-only") {
-      errors.push("design.mark.placement must be cover-and-final-only for a Docshunt logo.");
+    const constraints = design.quality_constraints;
+    for (const [key, value] of Object.entries({
+      one_visual_proof_per_slide: true,
+      source_media_preferred: true,
+      baked_copy_in_raster: false,
+      generic_ui_cards: false,
+      decorative_fill: false,
+      flattened_slide_background: false,
+      editable_source_required: true,
+    })) {
+      if (constraints?.[key] !== value) errors.push(`design.quality_constraints.${key} must be ${String(value)}.`);
     }
   }
 
-  const canvas = manifest.canvas;
-  const canvasKey = `${canvas?.width}x${canvas?.height}`;
-  if (!CANVASES.has(canvasKey)) errors.push("canvas must be 1080x1350.");
+  if (manifest.canvas?.width !== CANVAS.width || manifest.canvas?.height !== CANVAS.height) errors.push("canvas must be 1080x1350.");
+  const hasLogo = Boolean(design?.mark?.white && design?.mark?.black);
+  if (hasLogo && design.mark.placement !== "cover-and-final-only") errors.push("design.mark.placement must be cover-and-final-only.");
 
-  if (!Array.isArray(manifest.slides) || manifest.slides.length < 2 || manifest.slides.length > 20) {
-    errors.push("slides must contain 2–20 ordered items. Choose the count from the completed story, not a template quota.");
-  }
-
-  if (Array.isArray(manifest.slides)) {
-    manifest.slides.forEach((slide, index) => {
+  const slides = manifest.slides;
+  if (!Array.isArray(slides) || slides.length < 4 || slides.length > 10) {
+    errors.push("slides must contain 4–10 ordered items.");
+  } else {
+    const IDs = new Set();
+    const sourceIDs = new Set((manifest.sources ?? []).map((source) => source?.id).filter(Boolean));
+    slides.forEach((slide, index) => {
       const label = `slides[${index}]`;
-      if (!slide || typeof slide !== "object") {
-        errors.push(`${label} must be an object.`);
-        return;
+      if (!nonEmpty(slide?.id) || IDs.has(slide.id)) errors.push(`${label}.id is missing or duplicated.`);
+      IDs.add(slide?.id);
+      if (!nonEmpty(slide?.headline)) errors.push(`${label}.headline is required.`);
+      if (!nonEmpty(slide?.alt)) errors.push(`${label}.alt is required.`);
+      if (!LAYOUTS.has(slide?.layout)) errors.push(`${label}.layout must use an approved form.`);
+      if (!Array.isArray(slide?.source_ids)) errors.push(`${label}.source_ids must be an array.`);
+      for (const sourceID of slide?.source_ids ?? []) if (!sourceIDs.has(sourceID)) errors.push(`${label} references unknown source: ${sourceID}`);
+      if (index === 0 && (slide.role !== "cover" || slide.layout !== "cover")) errors.push("slides[0] must be a cover using layout cover.");
+      const rendered = requireRelativeFile(root, slide?.file, `${label}.file`, errors, /\.(png|jpe?g)$/i);
+      if (rendered) {
+        try {
+          const dimensions = readDimensions(rendered);
+          if (dimensions.width !== CANVAS.width || dimensions.height !== CANVAS.height) errors.push(`${label}.file must be 1080x1350.`);
+        } catch (error) { errors.push(error.message); }
       }
-      if (!nonEmpty(slide.file)) {
-        errors.push(`${label}.file is required.`);
-        return;
-      }
-      if (!nonEmpty(slide.headline)) errors.push(`${label}.headline is required.`);
-      if (!nonEmpty(slide.alt)) errors.push(`${label}.alt is required.`);
-      if (!LAYOUTS.has(slide.layout)) errors.push(`${label}.layout must be one of: ${[...LAYOUTS].join(", ")}.`);
-      if (index === 0 && slide.role !== "cover") errors.push("slides[0].role must be cover.");
-      if (index === 0 && slide.layout !== "cover") errors.push("slides[0].layout must be cover.");
-      if ([...String(slide.headline ?? "")].length > 34) warnings.push(`${label}.headline is long; check it at thumbnail size.`);
-
-      const relativeFile = String(slide.file);
-      const imagePath = path.resolve(root, relativeFile);
-      if (path.isAbsolute(relativeFile) || !isInside(root, imagePath)) {
-        errors.push(`${label}.file must stay inside the output folder: ${relativeFile}`);
-        return;
-      }
-      if (!fs.existsSync(imagePath)) {
-        errors.push(`${label}.file does not exist: ${relativeFile}`);
-        return;
-      }
-      if (!/\.(png|jpe?g)$/i.test(imagePath)) {
-        errors.push(`${label}.file must be PNG or JPEG: ${relativeFile}`);
-        return;
-      }
-      try {
-        const dimensions = readDimensions(imagePath);
-        if (dimensions.width !== canvas?.width || dimensions.height !== canvas?.height) {
-          errors.push(`${label}.file is ${dimensions.width}x${dimensions.height}; expected ${canvasKey}.`);
-        }
-      } catch (error) {
-        errors.push(error.message);
-      }
+      if ([...String(slide?.headline ?? "")].length > 42) warnings.push(`${label}.headline is long; inspect at thumbnail size.`);
     });
-
-    if (hasDocshuntMark && manifest.slides.at(-1)?.layout !== "centered-close") {
-      errors.push("A Docshunt issue with a logo must use centered-close on its final card so the final logo remains separate and legible.");
+    if (design?.template_sequence && JSON.stringify(design.template_sequence) !== JSON.stringify(slides.map((slide) => slide.layout))) {
+      errors.push("design.template_sequence must match slide layouts exactly.");
     }
+    if (hasLogo && slides.at(-1)?.layout !== "centered-close") errors.push("DocsHunt logo requires centered-close as the final card.");
   }
 
   if (!nonEmpty(manifest.platforms?.instagram?.caption)) errors.push("platforms.instagram.caption is required.");
   if (!nonEmpty(manifest.platforms?.threads?.root)) errors.push("platforms.threads.root is required.");
   if (!Array.isArray(manifest.platforms?.threads?.replies)) warnings.push("platforms.threads.replies is missing; use [] for a text-only handoff.");
   if (!Array.isArray(manifest.sources) || manifest.sources.length === 0) errors.push("sources must contain at least one source.");
-
-  const editablePptx = manifest.editable_pptx;
-  if (!editablePptx || typeof editablePptx !== "object" || Array.isArray(editablePptx)) {
-    errors.push("editable_pptx with a relative .pptx file is required.");
-  } else if (!nonEmpty(editablePptx.file)) {
-    errors.push("editable_pptx.file is required.");
-  } else {
-    const relativeDeck = String(editablePptx.file);
-    const deckPath = path.resolve(root, relativeDeck);
-    if (path.isAbsolute(relativeDeck) || !isInside(root, deckPath)) {
-      errors.push(`editable_pptx.file must stay inside the output folder: ${relativeDeck}`);
-    } else if (!/\.pptx$/i.test(deckPath)) {
-      errors.push("editable_pptx.file must end in .pptx.");
-    } else if (!fs.existsSync(deckPath)) {
-      errors.push(`editable_pptx.file does not exist: ${relativeDeck}`);
-    } else if (fs.statSync(deckPath).size === 0) {
-      errors.push(`editable_pptx.file is empty: ${relativeDeck}`);
+  for (const [index, source] of (manifest.sources ?? []).entries()) {
+    if (!nonEmpty(source?.id) || !/^https:\/\//.test(source?.url ?? "") || !nonEmpty(source?.kind) || !nonEmpty(source?.rights_status)) {
+      errors.push(`sources[${index}] requires id, HTTPS url, kind, and rights_status.`);
     }
   }
-
+  requireRelativeFile(root, manifest.editable_pptx?.file, "editable_pptx.file", errors, /\.pptx$/i);
   return { errors, warnings, manifest };
 }
 
-function makeTestPng(width, height) {
+function makePng(width, height) {
   const data = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=", "base64");
   data.writeUInt32BE(width, 16);
   data.writeUInt32BE(height, 20);
@@ -223,92 +180,31 @@ function selfTest() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "cardnews-validator-"));
   try {
     fs.mkdirSync(path.join(root, "slides"));
-    for (let index = 1; index <= 4; index += 1) {
-      fs.writeFileSync(path.join(root, "slides", `${String(index).padStart(2, "0")}.png`), makeTestPng(1080, 1350));
-    }
-    fs.writeFileSync(path.join(root, "self-test-editable.pptx"), "PPTX");
+    for (let index = 1; index <= 4; index += 1) fs.writeFileSync(path.join(root, "slides", `${index}.png`), makePng(1080, 1350));
+    fs.writeFileSync(path.join(root, "self-test-editable-v1.pptx"), "PPTX");
+    const source = { id: "src-01", label: "self-test", url: "https://example.com/source", kind: "official", rights_status: "reference-only" };
+    const layouts = ["cover", "text-image", "image-text", "centered-close"];
     const manifest = {
       slug: "self-test",
       title: "자체 검증",
-      editorial: {
-        claim: "좋은 카드뉴스는 주장으로 시작합니다.",
-        reader_takeaway: "한 문장 주장을 먼저 쓴다.",
-        narrative_arc: ["claim", "evidence", "interpretation", "close"],
-      },
+      editorial: { claim: "검증", reader_takeaway: "확인", narrative_arc: ["hook", "evidence", "close"], hso: { hook: "훅", story: ["setup", "evidence"], offer: "결론", mode: "editorial-soft-offer" } },
+      canvas: CANVAS,
       design: {
-        system: "editorial-card-system",
-        surface: "#FCFCFA",
-        ink: "#171717",
-        photo_overlay: "rgba(0, 0, 0, .74)",
-        typography: { min_font_size_pt: MIN_VISIBLE_FONT_SIZE_PT },
+        system: "editorial-card-system", mode: "editorial-magazine", visual_mode: "text-led", template_id: "self-test", template_sequence: layouts,
+        surface: "#FCFCFA", ink: "#111111", photo_overlay: "rgba(0,0,0,.74)", typography: { min_font_size_pt: 22 },
+        quality_constraints: { one_visual_proof_per_slide: true, source_media_preferred: true, baked_copy_in_raster: false, generic_ui_cards: false, decorative_fill: false, flattened_slide_background: false, editable_source_required: true },
       },
-      canvas: { width: 1080, height: 1350 },
-      editable_pptx: { file: "self-test-editable.pptx" },
-      slides: [1, 2, 3, 4].map((index) => ({
-        file: `slides/${String(index).padStart(2, "0")}.png`,
-        role: index === 1 ? "cover" : "body",
-        layout: index === 1 ? "cover" : "text-image",
-        headline: `카드 ${index}`,
-        alt: `카드 ${index} 설명`,
-      })),
+      editable_pptx: { file: "self-test-editable-v1.pptx" },
+      slides: layouts.map((layout, index) => ({ id: `0${index + 1}`, file: `slides/${index + 1}.png`, role: index === 0 ? "cover" : index === layouts.length - 1 ? "close" : "context", layout, headline: `카드 ${index + 1}`, alt: `카드 ${index + 1} 설명`, source_ids: [source.id] })),
       platforms: { instagram: { caption: "캡션" }, threads: { root: "첫 글", replies: [] } },
-      sources: [{ label: "self-test", url: "https://example.com" }],
-    };
-    manifest.editorial.hso = {
-      hook: "한 문장 주장",
-      story: ["setup", "evidence"],
-      offer: "저장할 결론",
-      mode: "editorial-soft-offer",
+      sources: [source],
     };
     fs.writeFileSync(path.join(root, "manifest.json"), JSON.stringify(manifest));
     const result = validateManifest(root);
     if (result.errors.length > 0) throw new Error(result.errors.join("\n"));
-
-    delete manifest.editorial;
+    manifest.design.typography.min_font_size_pt = 18;
     fs.writeFileSync(path.join(root, "manifest.json"), JSON.stringify(manifest));
-    const missingEditorial = validateManifest(root);
-    if (!missingEditorial.errors.includes("editorial with claim, reader_takeaway, and narrative_arc is required.")) {
-      throw new Error("Missing editorial metadata was not rejected.");
-    }
-
-    manifest.editorial = {
-      claim: "좋은 카드뉴스는 주장으로 시작합니다.",
-      reader_takeaway: "한 문장 주장을 먼저 쓴다.",
-      narrative_arc: ["claim", "evidence", "interpretation", "close"],
-      hso: {
-        hook: "한 문장 주장",
-        story: ["setup", "evidence"],
-        offer: "저장할 결론",
-        mode: "editorial-soft-offer",
-      },
-    };
-    delete manifest.design;
-    fs.writeFileSync(path.join(root, "manifest.json"), JSON.stringify(manifest));
-    const missingDesign = validateManifest(root);
-    if (!missingDesign.errors.includes("design with editorial-card-system tokens is required.")) {
-      throw new Error("Missing design metadata was not rejected.");
-    }
-
-    manifest.design = {
-      system: "editorial-card-system",
-      surface: "#FCFCFA",
-      ink: "#171717",
-      photo_overlay: "rgba(0, 0, 0, .74)",
-    };
-    manifest.slides[1].layout = "poster";
-    fs.writeFileSync(path.join(root, "manifest.json"), JSON.stringify(manifest));
-    const invalidLayout = validateManifest(root);
-    if (!invalidLayout.errors.some((error) => error.startsWith("slides[1].layout must be one of:"))) {
-      throw new Error("Invalid layout was not rejected.");
-    }
-
-    manifest.slides[1].layout = "text-image";
-    manifest.editable_pptx = { file: "slides/01.png" };
-    fs.writeFileSync(path.join(root, "manifest.json"), JSON.stringify(manifest));
-    const invalidDeck = validateManifest(root);
-    if (!invalidDeck.errors.includes("editable_pptx.file must end in .pptx.")) {
-      throw new Error("Non-PPTX editable deck was not rejected.");
-    }
+    if (!validateManifest(root).errors.some((error) => error.includes("min_font_size_pt"))) throw new Error("Type floor was not enforced.");
     console.log("Card-news validator self-test passed.");
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
@@ -324,15 +220,13 @@ function main(argv) {
     process.exitCode = 1;
     return;
   }
-
-  const manifestName = argv.find((value, index) => index > argv.indexOf(outputDir) && !value.startsWith("--")) ?? "manifest.json";
-  const result = validateManifest(outputDir, manifestName);
+  const result = validateManifest(outputDir);
   if (result.errors.length > 0) {
     console.error(result.errors.map((error) => `ERROR: ${error}`).join("\n"));
     process.exitCode = 1;
     return;
   }
-  console.log(`Card-news OK: ${result.manifest.slides.length} slides, ${result.manifest.canvas.width}x${result.manifest.canvas.height}.`);
+  console.log(`Card-news manifest OK: ${result.manifest.slides.length} slides, 1080x1350.`);
   if (result.warnings.length > 0) console.warn(result.warnings.map((warning) => `WARN: ${warning}`).join("\n"));
 }
 

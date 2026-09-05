@@ -1,16 +1,16 @@
 # @docshunt/cardnews-skills
 
-Codex-ready skills for Korean startup-support and business-plan content: search-led blog articles, editorial card news, and 16:9 presentations. They share a source-first, natural-Korean editorial process while keeping each output format's rules separate.
+Codex-ready skills for Korean startup-support and business-plan content: source-led blog articles, editorial card-news, and 16:9 presentations. They share a fact-first, natural-Korean editorial process while retaining output-specific rules.
 
 ## Install into Codex
 
-~~~bash
+```bash
 npx skills add Docshunt/cardnews-skills --skill cardnews-writing -a codex
 npx skills add Docshunt/cardnews-skills --skill blog-writing -a codex
 npx skills add Docshunt/cardnews-skills --skill presentation-writing -a codex
-~~~
+```
 
-Invoke SEO-aware blog articles with `$blog-writing`, card news with `$cardnews-writing`, and editable 16:9 decks with `$presentation-writing`.
+Invoke the installed skills with `$blog-writing`, `$cardnews-writing`, or `$presentation-writing`.
 
 ## Local development
 
@@ -19,29 +19,34 @@ npm test
 npm run pack:check
 ```
 
-The canonical skills live at `.agents/skills/blog-writing/`, `.agents/skills/cardnews-writing/`, and `.agents/skills/presentation-writing/`. npm packaging is configured through `npmSkills.publish.source` and includes all three skills plus this repository's operating files.
-
-The blog skill starts from a source-and-keyword brief: overseas material supplies the insight or case, while Korean primary sources supply current support-programme terminology and rules. The card-news and blog skills both use a Korean editorial pass after facts are locked. It removes translation-like and formulaic writing while preserving claims, figures, names, citations, and direct quotations; it is not a claim of authorship detection.
+The canonical skills live at `.agents/skills/blog-writing/`, `.agents/skills/cardnews-writing/`, and `.agents/skills/presentation-writing/`. Packaging is configured through `npmSkills.publish.source`.
 
 ## Card-news operating assets
 
-Before a card-news task, run `bash scripts/cardnews-session-preflight.sh`. It compares the local working copy with `origin/main` and never merges, rebases, resets, or overwrites work.
+Before card-news work, run `bash scripts/cardnews-session-preflight.sh`. It compares the working copy with `origin/main` without merging, rebasing, resetting, or overwriting work.
 
-Approved editable sources are registered in [templates/cardnews/template-registry.json](templates/cardnews/template-registry.json). The registry currently preserves the approved Canva v7 and Haruki v2 decks. A batch job selects one of those decks, supplies verbatim user copy in a separate content file, and changes only named inherited text and image slots:
+Approved editable sources are registered in [templates/cardnews/template-registry.json](templates/cardnews/template-registry.json). A batch job selects one approved deck, supplies verbatim copy from a separate content file, and changes only named inherited text and image slots:
 
 ```bash
 node scripts/build-cardnews-batch.mjs --job <job.json> --validate
 node scripts/build-cardnews-batch.mjs --job <job.json>
 ```
 
-The user copy is the canonical source: it is transferred without paraphrase, reordering, or silent line-break changes. Before a photo enters the deck, `scripts/prepare-cardnews-image.mjs` centre-crops it to its inherited frame ratio without stretching; the final crop is still checked on the rendered slide.
+User copy is canonical and must not be paraphrased, reordered, or silently re-line-broken. Before a photo enters a deck, `scripts/prepare-cardnews-image.mjs` crops it to the inherited frame ratio without stretching; the crop is checked again in the final render.
 
-Run `bash scripts/archive-cardnews-assets.sh` before replacing an approved deck or its working materials. It makes an immutable local snapshot in `archive/<timestamp>/` of existing outputs, working material, temporary renders, and QA evidence. Snapshots are intentionally ignored by Git because they preserve large user deliverables; the reusable archive command, template registry, batch job format, and checks remain in the package.
+Run `bash scripts/archive-cardnews-assets.sh` before replacing an approved deck or its working material. It makes an immutable local snapshot in `archive/<timestamp>/`. Snapshots are ignored because they may hold large, user-specific deliverables; the repeatable archive command, registry, batch format, and checks remain in this package.
+
+For a rendered card-news package, run both the manifest check and visual-quality harness:
+
+```bash
+node .agents/skills/cardnews-writing/scripts/validate-cardnews.mjs outputs/<slug>
+node .agents/skills/cardnews-writing/scripts/check-cardnews-quality.mjs outputs/<slug>
+```
 
 ## Output
 
-The card-news skill creates `1080×1350 px` (4:5) upload images and a matching editable `11.25×14.0625 in` (4:5) PowerPoint deck, plus platform-specific captions, alt text, and source tracking. Its bundled page system uses only a full-bleed photo cover, interview quote, text-over-image, image-over-text, and centered close. The text, source line, and every image placement remain separately editable in the PowerPoint deck. Read the bundled [manifest contract](.agents/skills/cardnews-writing/references/manifest.md), [editable PowerPoint guide](.agents/skills/cardnews-writing/references/editable-ppt.md), and [publishing notes](.agents/skills/cardnews-writing/references/publishing.md) when a task reaches QA or external publishing.
+The card-news skill delivers final `1080×1350px` PNG cards for upload, backed by an editable `11.25×14.0625in` 4:5 PPTX. It preserves original and used image crops, captions, alt text, sources, and a draft-to-final QA history. The deck uses a full-bleed photo cover, interview quote, text-image, image-text, and centered close; all text, source lines, photo areas, overlays, and mark images remain separately editable.
 
-The presentation skill creates editable 16:9 PowerPoint decks with the same editorial rhythm: opening, quote, text-image, image-text, and centered close. Its bundled template leaves every photo as a labeled shape for the presenter to replace. Read its [visual direction](.agents/skills/presentation-writing/references/visual-direction.md) and [deck-manifest contract](.agents/skills/presentation-writing/references/deck-manifest.md) before preparing a deck.
+When a reference deck is supplied, it is the production benchmark. Keep the draft, record concrete findings, make at least one needed visual correction, rerender the complete deck, and do not approve a card only because its file structure is valid. Read the [manifest](.agents/skills/cardnews-writing/references/manifest.md), [visual direction](.agents/skills/cardnews-writing/references/visual-direction.md), [quality harness](.agents/skills/cardnews-writing/references/quality-harness.md), and [publishing notes](.agents/skills/cardnews-writing/references/publishing.md).
 
-Actual Meta publishing is intentionally opt-in and credential-gated; the skill does not send publish requests during generation or validation.
+Actual Meta publishing remains opt-in and credential-gated; no generation, test, or QA command sends a publish request.

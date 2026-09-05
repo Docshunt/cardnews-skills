@@ -54,8 +54,8 @@ bash scripts/cardnews-session-preflight.sh
 - Never expose development terms or internal mechanics in progress updates or final messages. Do not mention repositories, branches, commits, pushes, packages, manifests, validators, scripts, commands, runtimes, or similar implementation details.
 - Describe only what was made, what was checked, where it is saved, and whether any user choice remains. Translate internal status into phrases such as `준비를 마쳤습니다`, `확인을 마쳤습니다`, and `공유 공간에 반영했습니다`.
 - Keep internal command output out of user-facing messages. Summarize it in one plain sentence.
-- When the user asks to see the result, resolve the card-news output folder and open that exact folder in macOS Finder with `open <absolute-output-folder>`. Then say only that the result folder was opened.
-- When the user explicitly asks to publish the reusable operating changes, commit and push only skill, template, and operating-guide changes to `main`. Keep every topic-specific result under `outputs/`, which must remain ignored and untracked. Never force-add anything from `outputs/`.
+- When the user asks to see the result, open `outputs/<slug>/final-images` when it exists; otherwise open `outputs/<slug>/slides`. Then say only that the result image folder was opened.
+- When the user explicitly asks to publish reusable operating changes, commit and push only skills, templates, the root `README.md`, and operating-guide changes to `main`. Keep every topic-specific result under `outputs/`, which must remain ignored and untracked. Never force-add anything from `outputs/`.
 - Always keep the root `README.md` as the permanent project guide. Do not rewrite, delete, ignore, or omit it unless the user explicitly asks. Do not add a second README inside the skill folder.
 
 ## Verification
@@ -73,6 +73,7 @@ For a real card-news output, also run:
 
 ```bash
 node .agents/skills/cardnews-writing/scripts/validate-cardnews.mjs outputs/<slug>
+node .agents/skills/cardnews-writing/scripts/check-cardnews-quality.mjs outputs/<slug>
 ```
 
 ## Codex collaboration
