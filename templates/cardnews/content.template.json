@@ -1,0 +1,26 @@
+{
+  "copy_policy": "verbatim",
+  "slides": [
+    {
+      "template_slide": 1,
+      "text": {
+        "card-1-headline": "사용자가 확정한\n표지 문구를 그대로 넣습니다."
+      },
+      "images": [
+        {
+          "image_index": 0,
+          "file": "assets/01-cover-prepared.jpg",
+          "alt": "표지의 근거 사진",
+          "fit": "cover",
+          "frame": { "width": 1080, "height": 1350 },
+          "source": {
+            "kind": "user-provided",
+            "url": "",
+            "rights_status": "사용자 제공"
+          }
+        }
+      ],
+      "notes_sources": ["https://example.com/source"]
+    }
+  ]
+}

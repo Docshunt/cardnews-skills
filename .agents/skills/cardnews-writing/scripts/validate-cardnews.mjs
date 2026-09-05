@@ -6,6 +6,7 @@ import path from "node:path";
 
 const CANVASES = new Set(["1080x1350"]);
 const LAYOUTS = new Set(["cover", "interview-quote", "text-image", "image-text", "centered-close"]);
+const MIN_VISIBLE_FONT_SIZE_PT = 22;
 const JPEG_SOFS = new Set([
   0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf,
 ]);
@@ -87,15 +88,45 @@ function validateManifest(outputDir, manifestName = "manifest.json") {
     } else if (editorial.narrative_arc.some((beat) => !nonEmpty(beat))) {
       errors.push("editorial.narrative_arc must contain only non-empty story beats.");
     }
+
+    const hso = editorial.hso;
+    if (!hso || typeof hso !== "object" || Array.isArray(hso)) {
+      errors.push("editorial.hso with hook, story, offer, and mode is required.");
+    } else {
+      if (!nonEmpty(hso.hook)) errors.push("editorial.hso.hook is required.");
+      if (!Array.isArray(hso.story) || hso.story.length < 2 || hso.story.some((beat) => !nonEmpty(beat))) {
+        errors.push("editorial.hso.story must contain at least two non-empty story beats.");
+      }
+      if (!nonEmpty(hso.offer)) errors.push("editorial.hso.offer is required.");
+      if (hso.mode !== "editorial-soft-offer") errors.push("editorial.hso.mode must be editorial-soft-offer.");
+    }
   }
 
   const design = manifest.design;
+  const hasDocshuntMark = Boolean(
+    design
+      && typeof design === "object"
+      && !Array.isArray(design)
+      && design.mark
+      && typeof design.mark === "object"
+      && nonEmpty(design.mark.white)
+      && nonEmpty(design.mark.black),
+  );
   if (!design || typeof design !== "object" || Array.isArray(design)) {
     errors.push("design with editorial-card-system tokens is required.");
   } else {
     if (design.system !== "editorial-card-system") errors.push("design.system must be editorial-card-system.");
     for (const token of ["surface", "ink", "photo_overlay"]) {
       if (!nonEmpty(design[token])) errors.push(`design.${token} is required.`);
+    }
+    const declaredMinFontSize = design.typography?.min_font_size_pt;
+    if (declaredMinFontSize === undefined) {
+      warnings.push(`design.typography.min_font_size_pt is missing; the editable-PPT builder enforces ${MIN_VISIBLE_FONT_SIZE_PT} pt.`);
+    } else if (!Number.isFinite(Number(declaredMinFontSize)) || Number(declaredMinFontSize) < MIN_VISIBLE_FONT_SIZE_PT) {
+      errors.push(`design.typography.min_font_size_pt must be at least ${MIN_VISIBLE_FONT_SIZE_PT}.`);
+    }
+    if (hasDocshuntMark && design.mark.placement !== "cover-and-final-only") {
+      errors.push("design.mark.placement must be cover-and-final-only for a Docshunt logo.");
     }
   }
 
@@ -148,6 +179,10 @@ function validateManifest(outputDir, manifestName = "manifest.json") {
         errors.push(error.message);
       }
     });
+
+    if (hasDocshuntMark && manifest.slides.at(-1)?.layout !== "centered-close") {
+      errors.push("A Docshunt issue with a logo must use centered-close on its final card so the final logo remains separate and legible.");
+    }
   }
 
   if (!nonEmpty(manifest.platforms?.instagram?.caption)) errors.push("platforms.instagram.caption is required.");
@@ -205,6 +240,7 @@ function selfTest() {
         surface: "#FCFCFA",
         ink: "#171717",
         photo_overlay: "rgba(0, 0, 0, .74)",
+        typography: { min_font_size_pt: MIN_VISIBLE_FONT_SIZE_PT },
       },
       canvas: { width: 1080, height: 1350 },
       editable_pptx: { file: "self-test-editable.pptx" },
@@ -217,6 +253,12 @@ function selfTest() {
       })),
       platforms: { instagram: { caption: "캡션" }, threads: { root: "첫 글", replies: [] } },
       sources: [{ label: "self-test", url: "https://example.com" }],
+    };
+    manifest.editorial.hso = {
+      hook: "한 문장 주장",
+      story: ["setup", "evidence"],
+      offer: "저장할 결론",
+      mode: "editorial-soft-offer",
     };
     fs.writeFileSync(path.join(root, "manifest.json"), JSON.stringify(manifest));
     const result = validateManifest(root);
@@ -233,6 +275,12 @@ function selfTest() {
       claim: "좋은 카드뉴스는 주장으로 시작합니다.",
       reader_takeaway: "한 문장 주장을 먼저 쓴다.",
       narrative_arc: ["claim", "evidence", "interpretation", "close"],
+      hso: {
+        hook: "한 문장 주장",
+        story: ["setup", "evidence"],
+        offer: "저장할 결론",
+        mode: "editorial-soft-offer",
+      },
     };
     delete manifest.design;
     fs.writeFileSync(path.join(root, "manifest.json"), JSON.stringify(manifest));

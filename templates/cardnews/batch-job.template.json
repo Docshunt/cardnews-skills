@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "slug": "new-cardnews-v1",
+  "template_id": "murakami-routine-v2",
+  "content_file": "content.json",
+  "output_file": "new-cardnews-v1-editable.pptx"
+}

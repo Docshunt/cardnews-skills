@@ -19,6 +19,7 @@ const MUTED = "#5A5A56";
 const PLACEHOLDER = "#E9E9E3";
 const FONT = "Pretendard";
 const SERIF = "Noto Serif KR";
+const MIN_FONT_SIZE_PT = 22;
 const MARGIN = 72;
 const LAYOUTS = new Set(["cover", "interview-quote", "text-image", "image-text", "centered-close"]);
 
@@ -40,10 +41,24 @@ function addText(slide, name, text, position, style = {}) {
     fontSize: 33,
     color: INK,
     lineSpacing: 1.58,
+    verticalAlignment: "top",
+    autoFit: "none",
     wrap: "square",
     insets: { top: 0, right: 0, bottom: 0, left: 0 },
     ...style,
   };
+  // Enforce the shared readability floor for every visible text object,
+  // including source lines and placeholder labels.
+  const requestedFontSize = Number(shape.text.style.fontSize);
+  shape.text.style.fontSize = Number.isFinite(requestedFontSize)
+    ? Math.max(MIN_FONT_SIZE_PT, requestedFontSize)
+    : MIN_FONT_SIZE_PT;
+  // PowerPoint can reflow Korean text differently from the preview renderer.
+  // Never allow automatic shrinking to violate the shared 22pt floor.
+  const safeAutoFit = style.autoFit === "shrinkText" ? "none" : style.autoFit ?? "none";
+  shape.text.style.autoFit = safeAutoFit;
+  shape.text.verticalAlignment = style.verticalAlignment ?? "top";
+  shape.text.autoFit = safeAutoFit;
   return shape;
 }
 
@@ -137,11 +152,28 @@ async function addPhoto(slide, spec, index, root, position, options = {}) {
   );
 }
 
+async function addBrandMark(slide, name, image, root, position, altText) {
+  const imagePath = resolveInside(root, image);
+  if (!imagePath) return false;
+  const imageStat = await stat(imagePath);
+  if (!imageStat.isFile()) throw new Error(`Brand mark is not a file: ${image}`);
+  const imageBytes = await readFile(imagePath);
+  slide.images.add({
+    blob: imageBytes,
+    contentType: imageContentType(imagePath),
+    alt: altText,
+    fit: "contain",
+    geometry: "rect",
+    position,
+  });
+  return true;
+}
+
 function addSourceLine(slide, index, text, position, { color = "#777772" } = {}) {
   const source = asText(text);
   if (!source) return;
   addText(slide, `card-${index}-source-line`, source, position, {
-    fontSize: 20,
+    fontSize: MIN_FONT_SIZE_PT,
     color,
     lineSpacing: 1.2,
   });
@@ -165,18 +197,18 @@ function addHeadline(slide, index, text, position, { white = false, centered = f
   });
 }
 
-function addBody(slide, index, text, position, { centered = false, size = 33 } = {}) {
+function addBody(slide, index, text, position, { centered = false, size = 31, lineSpacing = 1.38 } = {}) {
   const body = asText(text);
   if (!body) return;
   addText(slide, `card-${index}-body`, body, position, {
     fontSize: size,
     color: "#222222",
     alignment: centered ? "center" : "left",
-    lineSpacing: 1.58,
+    lineSpacing,
   });
 }
 
-function addEmphasis(slide, index, text, position, { centered = false, size = 33 } = {}) {
+function addEmphasis(slide, index, text, position, { centered = false, size = 31, lineSpacing = 1.28 } = {}) {
   const emphasis = asText(text);
   if (!emphasis) return;
   addText(slide, `card-${index}-emphasis`, emphasis, position, {
@@ -185,11 +217,11 @@ function addEmphasis(slide, index, text, position, { centered = false, size = 33
     underline: "sng",
     color: INK,
     alignment: centered ? "center" : "left",
-    lineSpacing: 1.48,
+    lineSpacing,
   });
 }
 
-async function addCover(deck, spec, index, root, mark) {
+async function addCover(deck, spec, index, root, mark, isFirstSlide) {
   const slide = deck.slides.add();
   slide.background.fill = PAPER;
   await addPhoto(slide, spec, index, root, { left: 0, top: 0, width: WIDTH, height: HEIGHT }, {
@@ -208,8 +240,18 @@ async function addCover(deck, spec, index, root, mark) {
     top: 880,
     width: WIDTH - MARGIN * 2,
     height: 320,
-  }, { white: true, size: 98 });
-  if (asText(mark)) {
+  }, { white: true, size: Number.isFinite(Number(spec.cover_size)) ? Number(spec.cover_size) : 98 });
+  const whiteMark = mark && typeof mark === "object" ? asText(mark.white) : "";
+  if (isFirstSlide && whiteMark) {
+    await addBrandMark(
+      slide,
+      `card-${index}-mark`,
+      whiteMark,
+      root,
+      { left: 430, top: 1252, width: 220, height: 55 },
+      "독스헌트 흰색 로고",
+    );
+  } else if (isFirstSlide && asText(mark)) {
     addText(slide, `card-${index}-mark`, mark, { left: 380, top: 1260, width: 320, height: 32 }, {
       fontSize: 27,
       bold: true,
@@ -219,6 +261,7 @@ async function addCover(deck, spec, index, root, mark) {
     });
   }
   addNotes(slide, spec.notes_sources);
+  return slide;
 }
 
 async function addInterviewQuote(deck, spec, index, root) {
@@ -238,19 +281,21 @@ async function addInterviewQuote(deck, spec, index, root) {
   });
   addSourceLine(slide, index, spec.source_line, { left: 72, top: 1274, width: 936, height: 28 });
   addNotes(slide, spec.notes_sources);
+  return slide;
 }
 
 async function addTextImage(deck, spec, index, root) {
   const slide = deck.slides.add();
   slide.background.fill = PAPER;
   addHeadline(slide, index, asText(spec.headline) || "제목을 여기에\n적습니다", { left: MARGIN, top: 72, width: 936, height: 155 });
-  addBody(slide, index, spec.body, { left: MARGIN, top: 275, width: 936, height: 230 });
-  addEmphasis(slide, index, spec.emphasis, { left: MARGIN, top: 538, width: 936, height: 82 });
+  addBody(slide, index, spec.body, { left: MARGIN, top: 276, width: 936, height: 208 });
+  addEmphasis(slide, index, spec.emphasis, { left: MARGIN, top: 534, width: 936, height: 88 });
   addSourceLine(slide, index, spec.source_line, { left: MARGIN, top: 638, width: 936, height: 26 });
   await addPhoto(slide, spec, index, root, { left: 0, top: 688, width: WIDTH, height: 662 }, {
     defaultLabel: "사진: 맥락을 보여주는 현장 · 가로",
   });
   addNotes(slide, spec.notes_sources);
+  return slide;
 }
 
 async function addImageText(deck, spec, index, root) {
@@ -260,29 +305,50 @@ async function addImageText(deck, spec, index, root) {
     defaultLabel: "사진: 인물·현장·제품 중 하나 · 가로",
   });
   addHeadline(slide, index, asText(spec.headline) || "사진 뒤의 의미를\n여기에 적습니다", { left: MARGIN, top: 758, width: 936, height: 145 });
-  addBody(slide, index, spec.body, { left: MARGIN, top: 944, width: 936, height: 190 });
-  addEmphasis(slide, index, spec.emphasis, { left: MARGIN, top: 1164, width: 936, height: 74 });
+  addBody(slide, index, spec.body, { left: MARGIN, top: 945, width: 936, height: 170 });
+  addEmphasis(slide, index, spec.emphasis, { left: MARGIN, top: 1154, width: 936, height: 88 });
   addSourceLine(slide, index, spec.source_line, { left: MARGIN, top: 1284, width: 936, height: 26 });
   addNotes(slide, spec.notes_sources);
+  return slide;
 }
 
-function addCenteredClose(deck, spec, index) {
+async function addCenteredClose(deck, spec, index, root, mark, isFinalSlide) {
   const slide = deck.slides.add();
   slide.background.fill = PAPER;
-  addHeadline(slide, index, asText(spec.headline) || "마지막 문장을\n여기에 적습니다", { left: 110, top: 440, width: 860, height: 170 }, {
+  addHeadline(slide, index, asText(spec.headline) || "마지막 문장을\n여기에 적습니다", { left: 110, top: 420, width: 860, height: 210 }, {
     centered: true,
     size: 62,
   });
-  addBody(slide, index, spec.body, { left: 110, top: 678, width: 860, height: 145 }, { centered: true, size: 38 });
-  addEmphasis(slide, index, spec.emphasis, { left: 110, top: 900, width: 860, height: 102 }, { centered: true, size: 38 });
+  addBody(slide, index, spec.body, { left: 110, top: 700, width: 860, height: 140 }, { centered: true, size: 38, lineSpacing: 1.45 });
+  addEmphasis(slide, index, spec.emphasis, { left: 110, top: 920, width: 860, height: 110 }, { centered: true, size: 38, lineSpacing: 1.36 });
+  const blackMark = mark && typeof mark === "object" ? asText(mark.black) : "";
+  if (isFinalSlide && blackMark) {
+    await addBrandMark(
+      slide,
+      `card-${index}-mark`,
+      blackMark,
+      root,
+      { left: 430, top: 1202, width: 220, height: 55 },
+      "독스헌트 검은색 로고",
+    );
+  } else if (isFinalSlide && asText(mark)) {
+    addText(slide, `card-${index}-mark`, mark, { left: 380, top: 1215, width: 320, height: 32 }, {
+      fontSize: 27,
+      bold: true,
+      color: INK,
+      alignment: "center",
+      lineSpacing: 1,
+    });
+  }
   addSourceLine(slide, index, spec.source_line, { left: MARGIN, top: 1274, width: 936, height: 28 });
   addNotes(slide, spec.notes_sources);
+  return slide;
 }
 
 function templateManifest() {
   return {
     title: "수정 가능한 카드뉴스 템플릿",
-    design: { mark: "BRAND" },
+    design: { typography: { min_font_size_pt: MIN_FONT_SIZE_PT }, mark: "BRAND" },
     slides: [
       {
         layout: "cover",
@@ -338,16 +404,20 @@ async function createDeck(manifest, root, output) {
     throw new Error("The manifest needs at least one slide.");
   }
   const deck = Presentation.create({ slideSize: { width: WIDTH, height: HEIGHT } });
-  const mark = asText(manifest.design?.mark);
+  const mark = typeof manifest.design?.mark === "string"
+    ? asText(manifest.design.mark)
+    : manifest.design?.mark;
 
   for (const [offset, spec] of manifest.slides.entries()) {
     const index = offset + 1;
     if (!LAYOUTS.has(spec?.layout)) throw new Error(`Slide ${index} has an unsupported layout: ${spec?.layout}`);
-    if (spec.layout === "cover") await addCover(deck, spec, index, root, mark);
+    if (spec.layout === "cover") await addCover(deck, spec, index, root, mark, index === 1);
     if (spec.layout === "interview-quote") await addInterviewQuote(deck, spec, index, root);
     if (spec.layout === "text-image") await addTextImage(deck, spec, index, root);
     if (spec.layout === "image-text") await addImageText(deck, spec, index, root);
-    if (spec.layout === "centered-close") addCenteredClose(deck, spec, index);
+    if (spec.layout === "centered-close") {
+      await addCenteredClose(deck, spec, index, root, mark, index === manifest.slides.length);
+    }
   }
 
   await mkdir(path.dirname(output), { recursive: true });

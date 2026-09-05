@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "copyPolicy": "verbatim",
+  "templates": [
+    {
+      "id": "murakami-routine-v2",
+      "file": "templates/cardnews/approved/murakami-routine-cardnews-editable-v2.pptx",
+      "slideCount": 9,
+      "canvas": {
+        "renderPx": { "width": 1080, "height": 1350 },
+        "pptx": { "widthEmu": 10287000, "heightEmu": 12858750, "widthIn": 11.25, "heightIn": 14.0625 }
+      },
+      "useWhen": "텍스트 비중이 높고, 사진과 여백을 번갈아 쓰는 이야기형 카드뉴스",
+      "fixedType": {
+        "coverTitlePt": 80,
+        "storyHeadingPt": 38,
+        "bodyMinPt": 24,
+        "bodyEmphasisPt": 28,
+        "absoluteFloorPt": 22
+      },
+      "imageRule": "사진은 사전 크롭 후 기존 프레임에 cover로만 교체하고, 프레임·비율·마스크를 바꾸지 않는다."
+    },
+    {
+      "id": "canva-ai-transition-v7",
+      "file": "templates/cardnews/approved/canva-ai-transition-cardnews-v7.pptx",
+      "slideCount": 9,
+      "canvas": {
+        "renderPx": { "width": 1080, "height": 1350 },
+        "pptx": { "widthEmu": 10287000, "heightEmu": 12858750, "widthIn": 11.25, "heightIn": 14.0625 }
+      },
+      "useWhen": "제품·회사·시장 변화를 보여주며 사진 주도형 표지와 리듬을 쓰는 카드뉴스",
+      "fixedType": {
+        "coverTitlePt": 80,
+        "storyHeadingPt": 38,
+        "bodyMinPt": 24,
+        "bodyEmphasisPt": 28,
+        "absoluteFloorPt": 22
+      },
+      "imageRule": "사진은 사전 크롭 후 기존 프레임에 cover로만 교체하고, 프레임·비율·마스크를 바꾸지 않는다."
+    }
+  ]
+}

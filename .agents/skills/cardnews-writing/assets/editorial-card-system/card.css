@@ -56,7 +56,8 @@ body {
   margin: 0;
   color: currentColor;
   font-family: var(--sans);
-  font-size: 28px;
+  /* 30px is the practical HTML equivalent of the 22pt minimum. */
+  font-size: 30px;
   font-weight: 900;
   letter-spacing: -.075em;
   line-height: 1;

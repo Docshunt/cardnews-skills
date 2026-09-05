@@ -2,6 +2,8 @@
 
 This is a reference-led visual grammar for Korean editorial carousels. It studies the provided examples' restraint, photo placement, and reading rhythm. It does not authorize copying another publisher's logo, exact post, phrase, photo, or brand mark.
 
+The target feeling is a text-led editorial magazine in the spirit of the supplied dy1.mag references: a claim with a point of view, documentary evidence, short broken lines, and an editor's interpretation. It is not a generic “pretty card-news” template. Treat the reference as a grammar of hierarchy and rhythm, not as a source of assets or wording.
+
 ## The visual grammar
 
 The visual identity comes from a small number of repeated page shapes.
@@ -12,7 +14,15 @@ The visual identity comes from a small number of repeated page shapes.
 - A close is calm and centered. It receives no visual reward other than white space and the weight of its sentence.
 - The color system is almost absent. Black typography, white or slightly warm paper, and the photograph's own colors are enough.
 
-Do not add a generic header, page count, category label, footer, graphic shape, colourful underline, icon, sticker, or ornamental chart. The only optional repeating element is a small user-owned mark, placed at the bottom of a cover or discreetly near a lower page edge.
+### Reference grammar to preserve
+
+- The cover is a claim, not a category label (`AI 시대의 변화 5가지`); use a specific question, reversal, or assertion.
+- A page is a paragraph in a swipeable essay. Short line breaks create rhythm, while facts, interpretation, and conclusion remain visibly distinct.
+- Photos are evidence: a real person, product interface, event, archive, or working scene that advances the sentence. Generic laptop/desk atmosphere is not evidence.
+- Keep a small, repeatable set of forms. Topic changes may change the photo and copy, not the layout language.
+- The final card leaves a sentence worth saving. A soft brand connection may follow the conclusion, but the card must still work without it.
+
+Do not add a generic header, page count, category label, footer, graphic shape, colourful underline, icon, sticker, or ornamental chart. For a Docshunt issue, use its logo image only at the bottom of the first cover and on the final closing card; never repeat it on intermediate pages.
 
 ## Five page forms
 
@@ -29,6 +39,7 @@ Use two or three of these forms repeatedly in one issue. A 7-slide profile can b
 ## Type and copy placement
 
 - Use one Korean sans-serif family for headings and explanatory text. A Korean serif is allowed only for the voice of an interview quote.
+- Keep every visible text element at or above `22 pt` in the editable PowerPoint. In the 1080×1350 HTML/raster renderer, use at least `30px` for the equivalent physical size; this applies to source lines, marks, labels, and credits as well as headlines and body copy.
 - Cover title: 92–112px, weight 800–900, line-height 1.06–1.12, left-aligned. Do not add a deck or an eyebrow.
 - Story heading: 58–66px, weight 800–900, line-height 1.20. Number it only when the issue needs a chronological sequence, such as `3. 두 번째 회사도, 첫 게임부터 망합니다.`
 - Story body: 31–35px, line-height 1.55–1.65, left-aligned. Keep paragraphs short and leave a visible gap between them.
@@ -47,10 +58,20 @@ The title and body do not need to fill every available space. Split text before 
 - Use black-and-white photography only when it belongs to the source material or makes a consistent interview sequence. Never apply it as a generic retro filter.
 - Credit images in the caption, source list, or a readable source page; do not sacrifice the visual form to a tiny illegible credit line.
 
+### Image-source ladder
+
+1. User-provided or commissioned original image.
+2. Official company newsroom, press kit, product page, creator/person channel, or primary archive.
+3. Licensed stock or public-domain archive with clear reuse terms.
+4. AI illustration only for a non-factual concept when the first three options cannot express it.
+
+Use Google Images, Pinterest, and reposts to discover candidates, then trace each candidate to the original source before downloading. Record the original URL, creator/owner, retrieval date when useful, and license/permission status. Never use an AI image to depict a real founder, event, product screen, statistic, or quote as if it were documentary evidence.
+
 ## Surface, spacing, and marks
 
 ```text
 canvas:              1080 × 1350
+PPT page:            11.25 × 14.0625 in (10287000 × 12858750 EMU)
 story copy inset:    72px left/right; 74–88px top/bottom
 cover copy inset:    72px left/right; lower 120px reserved for mark / breathing room
 story block split:   roughly 51 / 49 or 52 / 48
@@ -76,4 +97,4 @@ At full-size and at 320px wide, reject and revise if any answer is no:
 - Is the interview page substantially quieter than the cover and story pages?
 - Could a reader identify the headline and first paragraph without zooming?
 - Have page numbers, mastheads, colored accents, stickers, and invented data been removed?
-- Does the user-owned mark remain small and never compete with the claim or photo subject?
+- For a Docshunt issue, does the small logo appear only on the first and final cards, without competing with the claim or conclusion?
